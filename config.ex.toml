@@ -1,0 +1,10 @@
+[HTTP]
+Port = 8000
+
+[GitHub]
+AccessToken = "GitHub access token"
+RepoOwner = "Owner"
+RepoName = "Name"
+
+[ZenHub]
+APIToken = "ZenHub access token"

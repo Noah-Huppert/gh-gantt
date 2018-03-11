@@ -2,5 +2,5 @@
 vendor/
 
 # Configuration
-!config.ex.toml
 config.*
+!config.ex.toml
