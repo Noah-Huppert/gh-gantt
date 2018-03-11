@@ -1,0 +1,6 @@
+# Go
+vendor/
+
+# Configuration
+!config.ex.toml
+config.*
