@@ -2,26 +2,39 @@ package zenhub
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
-	"github.com/google/go-github/github"
-
 	"github.com/Noah-Huppert/gh-gantt/config"
+
+	"github.com/google/go-github/github"
 )
 
 // IssueDeps holds GitHub issue dependency information.
 type IssueDeps struct {
-	// ID is the GitHub issue identifier
-	ID int64
+	// BlockedBy holds the GitHub issue numbers which are blocking the
+	// issue
+	BlockedBy []int `json:"blocked_by"`
 
-	// BlockedBy holds the IDs of GitHub issues which are blocking the
-	// issue specified by `ID`.
-	BlockedBy []int64
+	// Blocking holds the GitHub issue numbers which are being blocked
+	// by the issue
+	Blocking []int `json:"blocking"`
+}
 
-	// Blocking holds the IDs of the GitHub issues which are being blocked
-	// by the issue specified by `ID`.
-	Blocking []int64
+// DepIssue is a github.Issue with fields for dependency information
+type DepIssue struct {
+	github.Issue
+	IssueDeps
+}
+
+// NewDepIssue creates a new DepIssue instance from a github.Issue and a IssueDeps
+func NewDepIssue(iss github.Issue, deps IssueDeps) DepIssue {
+	return DepIssue{
+		iss,
+		deps,
+	}
 }
 
 // DepsURL is the URL used to retrieve issue dependency information.
@@ -29,12 +42,33 @@ type IssueDeps struct {
 // values, both numbers:
 // 	1. repo id
 //	2. issue id
-const DepsURL string = "api.zenhub.io/v4/repositories/%d/issues/%d/dependencies"
+const DepsURL string = "https://api.zenhub.io/v4/repositories/%d/issues/%d/dependencies"
+
+// extractIssueNumbers returns an array of issue numbers from the specified
+// array of maps. An error is returned if one occurs.
+func extractIssueNumbers(data []map[string]interface{}) ([]int, error) {
+	numbers := []int{}
+
+	// Loop through items
+	for _, item := range data {
+		// Convert to int
+		val := item["issue_number"]
+		num, ok := val.(float64)
+		if !ok {
+			return nil, fmt.Errorf("error converting value to string, "+
+				"val: %#v", val)
+		}
+
+		numbers = append(numbers, int(num))
+	}
+
+	return numbers, nil
+}
 
 // RetrieveDeps returns an IssueDeps instance containing dependency information
 // for the specified issue. An error is returned if one occurs.
-func RetrieveDeps(ctx context.Context, cfg *config.Config,
-	ghClient *github.Client, repoId int64, issueId int64) (IssueDeps, error) {
+func RetrieveDeps(ctx context.Context, cfg *config.Config, repoId int64,
+	issueId int) (IssueDeps, error) {
 
 	// Setup ZenHub API request
 	reqUrl := fmt.Sprintf(DepsURL, repoId, issueId)
@@ -45,7 +79,7 @@ func RetrieveDeps(ctx context.Context, cfg *config.Config,
 			"%s", err.Error())
 	}
 
-	req.Header.Set("X-Authentication-Token", cfg.ZenHub.APIToken)
+	req.Header.Add("x-authentication-token", cfg.ZenHub.APIToken)
 
 	// Make request
 	client := &http.Client{}
@@ -57,12 +91,44 @@ func RetrieveDeps(ctx context.Context, cfg *config.Config,
 	}
 	defer resp.Body.Close()
 
+	// Read request body
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return IssueDeps{}, fmt.Errorf("error reading HTTP response "+
+			"body: %s", err.Error())
+	}
+
+	body := map[string][]map[string]interface{}{}
+	if err = json.Unmarshal(bodyBytes, &body); err != nil {
+		return IssueDeps{}, fmt.Errorf("error unmarshalling HTTP "+
+			"response into JSON: %s", err.Error())
+	}
+
 	// Check request succeeded
 	if resp.StatusCode == http.StatusOK {
-		fmt.Printf("body: %#v", resp.Body)
-		return IssueDeps{}, nil
+		deps := IssueDeps{}
+
+		// Blocked by
+		blockedBy, err := extractIssueNumbers(body["blocked_by"])
+		if err != nil {
+			return IssueDeps{}, fmt.Errorf("error retrieving "+
+				"blocked by issue numbers: %s", err.Error())
+		}
+
+		deps.BlockedBy = blockedBy
+
+		// Blocking
+		blocking, err := extractIssueNumbers(body["blocking"])
+		if err != nil {
+			return IssueDeps{}, fmt.Errorf("error retrieving "+
+				"blocking issue numbers: %s", err.Error())
+		}
+
+		deps.Blocking = blocking
+
+		return deps, nil
 	} else {
 		return IssueDeps{}, fmt.Errorf("non OK status code response: "+
-			"%d, body: %#v", resp.StatusCode, resp.Body)
+			"%d, body: %#v", resp.StatusCode, body)
 	}
 }

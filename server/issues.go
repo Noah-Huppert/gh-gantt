@@ -2,10 +2,12 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/Noah-Huppert/gh-gantt/config"
 	"github.com/Noah-Huppert/gh-gantt/gh"
+	"github.com/Noah-Huppert/gh-gantt/zenhub"
 	"github.com/google/go-github/github"
 )
 
@@ -45,15 +47,40 @@ func (i Issues) Register(mux *http.ServeMux) {
 
 // Get retrieves all GitHub issues.
 func (i Issues) Get(w http.ResponseWriter, r *http.Request) {
-	// Get issues
-	issues, err := gh.RetrieveIssues(i.ctx, i.cfg, i.ghClient)
+	// Get repo
+	repo, err := gh.RetrieveRepo(i.ctx, i.cfg, i.ghClient)
 	if err != nil {
-		WriteErr(w, 500, err)
+		WriteErr(w, 500, fmt.Errorf("error retrieving GitHub repo: %s",
+			err.Error()))
 		return
 	}
 
-	resp := map[string]interface{}{
-		"issues": issues,
+	// Get issues
+	issues, err := gh.RetrieveIssues(i.ctx, i.cfg, i.ghClient)
+	if err != nil {
+		WriteErr(w, 500, fmt.Errorf("error retrieving GitHub issues: %s",
+			err.Error()))
+		return
 	}
+
+	// Get issue dependencies
+	depIssues := []zenhub.DepIssue{}
+	for _, issue := range issues {
+		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, *repo.ID, *issue.Number)
+		if err != nil {
+			WriteErr(w, 500, fmt.Errorf("error retrieving "+
+				"issue dependencies, issue #: %d, err: %s",
+				issue.Number, err.Error()))
+			return
+		}
+
+		depIss := zenhub.NewDepIssue(*issue, deps)
+		depIssues = append(depIssues, depIss)
+	}
+
+	// Respond
+	resp := map[string]interface{}{}
+	resp["issues"] = depIssues
+
 	WriteJSON(w, 200, resp)
 }

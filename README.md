@@ -11,13 +11,20 @@ GitHub issues gantt chart generator.
 Make a copy of `config.ex.toml` named `config.toml` and fill it in with your 
 own values.  
 
+- HTTP: Web server configuration
+	- Port: Port to handle HTTP traffic from
 - GitHub: Configuration related to GitHub issues API
 	- AccessToken: GitHub API access token used to retrieve repo issues
 	- RepoOwner: Login of GitHub user who owns repository
 	- RepoName: Name of GitHub repository to retrieve issues from
 - ZenHub:
 	- APIToken: ZenHub API access token  
-		    Make an [API token in the ZenHub dashboard](https://app.zenhub.com/dashboard/tokens)
+	            Must retrieve special ZenHub authentication token by:
+		    	- [Navigating to app.zenhub.com](https://app.zenhub.com)
+			- Run in the console
+			  ```js
+			  window.localStorage.getItem("api_token")
+			  ```
 
 # Undocument ZenHub API Endpoints
 ZenHub documents many of their endpoints. However some have not been documented, 
@@ -27,18 +34,22 @@ and provide key information.
 Provides information about an issue's dependencies.  
 
 ### Request
-URL: `api.zenhub.io/v4/repositories/:repo_id/issues/:issue_id/dependencies`  
+URL: `api.zenhub.io/v4/repositories/:repo_id/issues/:issue_number/dependencies`  
 
-| Key        | Description                                     |
-| ---------- | ----------------------------------------------- |
-| `repo_id`  | ID of GitHub repository to retrieve issues from | 
-| `issue_id` | ID of GitHub issue to retrieve dependencies for |
+| Key            | Description                                     |
+| -------------- | ----------------------------------------------- |
+| `repo_id`      | ID of GitHub repository to retrieve issues from | 
+| `issue_number` | Issue number to retrieve dependencies for       |
 
 ### Response
 JSON payload with fields:
 
-- `blocked_by` (`User[]`): Array of GitHub issue models blocked by issue
-- `blocking` (`User[]`): Array of GitHub issue models blocking current issue
+- `blocked_by` (`[]Dependency`): Array of dependency information about items 
+				 currently blocking the specified issue
+- `blocking` (`[]Dependency`): Array of dependency information about
+
+Dependency information is returned in the form of a Dependency object. Which 
+is a combination of the repository, issue, and pull request models.  
 
 Example:  
 ```json

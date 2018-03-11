@@ -9,8 +9,8 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/config"
 )
 
-// RetrieveRepo returns the repository specified. An error is returned if
-// one occurs.
+// RetrieveRepo returns the repository specified in the configuration. An
+// error is returned if one occurs.
 func RetrieveRepo(ctx context.Context, cfg *config.Config,
 	ghClient *github.Client) (*github.Repository, error) {
 
