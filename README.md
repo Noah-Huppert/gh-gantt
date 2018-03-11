@@ -69,7 +69,7 @@ Example:
 			"user":{"login":"a user"},
 			"pipeline": {
 				"name":"New Issues",
-				"_id":"5a95d4c9fd6a3f61bd502deb"
+				"_id":"122345566789"
 			},
 			"blocked":true
 		}
