@@ -15,7 +15,7 @@ The scheduling of tasks is determined by the Milestone they are in.
 
 Current status: Heavy development, screenshot:  
 
-![Gantt chart generated with gh-gantt tool](/static/img/screenshot.png)
+<img alt="Gantt chart generated with gh-gantt tool" width="400" src="/static/img/screenshot.png">
 
 # Setup
 ## Configuration File
