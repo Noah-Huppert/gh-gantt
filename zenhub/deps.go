@@ -65,6 +65,8 @@ func extractIssueNumbers(data []map[string]interface{}) ([]int, error) {
 	return numbers, nil
 }
 
+// TODO: Retrieve ZenHub milestone start date
+
 // RetrieveDeps returns an IssueDeps instance containing dependency information
 // for the specified issue. An error is returned if one occurs.
 func RetrieveDeps(ctx context.Context, cfg *config.Config, repoId int64,
