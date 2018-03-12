@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Loading data in Gantt 1.6 format</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+
+	<script src="../common/testdata.js?v=20180227"></script>
+	<style>
+		html, body {
+			padding: 0px;
+			margin: 0px;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+<div id="gantt_here" style='width:100%; height:100%;'></div>
+<script>
+	gantt.config.xml_date = "%Y,%m,%d";
+	gantt.init("gantt_here");
+	gantt.load("../common/olddata.xml", "oldxml");
+</script>
+</body>

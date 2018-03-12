@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Fixed size gantt</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+
+	<script src="../common/testdata.js?v=20180227"></script>
+</head>
+<body>
+<div id="gantt_here" style='width:1020px; height:400px;'></div>
+<script>
+	gantt.init("gantt_here");
+	gantt.parse(demo_tasks);
+</script>
+</body>

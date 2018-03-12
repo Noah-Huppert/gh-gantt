@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Expand container</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+
+	<script src="../common/testdata.js?v=20180227"></script>
+	<style>
+		html, body {
+			padding: 0px;
+			margin: 0px;
+		}
+	</style>
+</head>
+
+<body>
+
+<div id="gantt_here"></div>
+<script>
+	gantt.config.xml_date = "%Y-%m-%d %H:%i:%s";
+	gantt.config.autosize = true;
+	gantt.init("gantt_here");
+	gantt.load("../common/data.json", "json");
+
+	gantt.message("Gantt container is adjusted to the size of the content");
+</script>
+</body>

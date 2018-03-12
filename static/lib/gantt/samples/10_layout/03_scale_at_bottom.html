@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Time scale at the bottom of gantt</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<script src="../common/testdata.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+	<style>
+		html, body {
+			padding: 0px;
+			margin: 0px;
+			height: 100%;
+		}
+
+		.no-scale .gantt_grid_scale,
+		.no-scale .gantt_task_scale {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+<div id="gantt_here" style='width:100%; height:100%;'></div>
+<script>
+
+	gantt.config.static_background = true;
+	gantt.config.xml_date = "%Y-%m-%d %H:%i:%s";
+	gantt.config.columns = [
+		{name: "text", tree: true, width: 200, resize: true},
+		{name: "start_date", align: "center", width: 80, resize: true},
+		{name: "duration", width: 50, align: "center"},
+		{name: "add", width: 44}
+	];
+
+	var mainGridConfig = {
+		scale_height: 0
+	};
+	var mainTimelineConfig = {
+		scale_height: 0
+	};
+
+	gantt.config.scale_height = 60;
+	gantt.config.layout = {
+		css: "gantt_container",
+		cols: [
+			{
+				rows: [
+					{
+						css: "no-scale",
+						cols: [
+							{
+								view: "grid",
+								group: "grids",
+								config: mainGridConfig,
+								scrollY: "scrollVer"
+							},
+							{
+								view: "timeline",
+								config: mainTimelineConfig,
+								scrollX: "scrollHor",
+								scrollY: "scrollVer"
+							}
+						]
+					},
+					{
+						height: gantt.config.scale_height,
+						cols: [
+							{
+								view: "grid",
+								group: "grids",
+								bind: null
+							},
+							{
+								view: "timeline",
+								scrollX: "scrollHor",
+								bind: null,
+								bindLinks: null
+							}
+						]
+					},
+					{view: "scrollbar", id: "scrollHor"}
+				]
+			},
+			{view: "scrollbar", id: "scrollVer"}]
+	};
+
+
+	gantt.init("gantt_here");
+	gantt.parse(generateData(50, new Date(2017, 11, 15), new Date(2018, 1, 1)));
+
+
+</script>
+</body>

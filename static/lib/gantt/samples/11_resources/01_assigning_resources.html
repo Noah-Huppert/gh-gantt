@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Assigning resources to tasks</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+	<style>
+		html, body {
+			height: 100%;
+			padding: 0px;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+		.gantt_task_line.gantt_project{
+			color:white;
+		}
+
+		.gantt_side_content{
+			color:#333;
+		}
+
+		.summary-bar{
+			font-weight: bold;
+		}
+
+		.gantt_resource_task .gantt_task_content{
+			color:inherit;
+		}
+
+		.gantt_resource_task .gantt_task_progress{
+			background-color:rgba(33,33,33,0.3);
+		}
+
+		.gantt_cell:nth-child(1) .gantt_tree_content{
+			border-radius: 16px;
+			width: 100%;
+			height: 80%;
+			margin: 5% 0;
+			line-height: 230%;
+		}
+	</style>
+</head>
+<body>
+<div id="gantt_here" style='width:100%; height:100%;'></div>
+<script>
+
+	gantt.message({
+		text:[
+			"Assign resources to the tasks.",
+			"Public API allows displaying resources in gantt, as well as resource coloring.",
+			"Double click a task to change the assigned user."
+		].join("<br><br>"),
+		expire: -1
+	});
+
+	gantt.serverList("staff", [
+		{key: 1, label: "John", backgroundColor:"#03A9F4", textColor:"#FFF"},
+		{key: 2, label: "Mike", backgroundColor:"#f57730", textColor:"#FFF"},
+		{key: 3, label: "Anna", backgroundColor:"#e157de", textColor:"#FFF"},
+		{key: 4, label: "Bill", backgroundColor:"#78909C", textColor:"#FFF"},
+		{key: 7, label: "Floe", backgroundColor:"#8D6E63", textColor:"#FFF"}
+	]);
+
+	gantt.serverList("priority", [
+		{key: 1, label: "High"},
+		{key: 2, label: "Normal"},
+		{key: 3, label: "Low"}
+	]);
+
+	// end test data
+	gantt.config.grid_width = 420;
+	gantt.config.grid_resize = true;
+	gantt.config.open_tree_initially = true;
+
+	var labels = gantt.locale.labels;
+	labels.column_priority = labels.section_priority = "Priority";
+	labels.column_owner = labels.section_owner = "Owner";
+
+	function byId(list, id) {
+		for (var i = 0; i < list.length; i++) {
+			if (list[i].key == id)
+				return list[i].label || "";
+		}
+		return "";
+	}
+
+	gantt.config.columns = [
+		{name: "owner", width: 80, align: "center", template: function (item) {
+				return byId(gantt.serverList('staff'), item.owner_id)}},
+		{name: "text", label: "Task name", tree: true, width: '*'},
+		{name: "priority", width: 80, align: "center", template: function (item) {
+				return byId(gantt.serverList('priority'), item.priority)}},
+		{name: "add", width: 40}
+	];
+
+	gantt.config.lightbox.sections = [
+		{name: "description", height: 38, map_to: "text", type: "textarea", focus: true},
+		{name: "priority", height: 22, map_to: "priority", type: "select", options: gantt.serverList("priority")},
+		{name: "owner", height: 22, map_to: "owner_id", type: "select", options: gantt.serverList("staff")},
+		{name: "time", type: "duration", map_to: "auto"}
+	];
+
+	gantt.templates.rightside_text = function(start, end, task){
+		return byId(gantt.serverList('staff'), task.owner_id);
+	};
+
+	gantt.templates.grid_row_class =
+		gantt.templates.task_row_class =
+			gantt.templates.task_class = function (start, end, task) {
+		var css = [];
+		if (task.$virtual || task.type == gantt.config.types.project)
+			css.push("summary-bar");
+
+		if(task.owner_id){
+			css.push("gantt_resource_task gantt_resource_" + task.owner_id);
+		}
+
+		return css.join(" ");
+	};
+
+	gantt.attachEvent("onLoadEnd", function(){
+		var styleId = "dynamicGanttStyles";
+		var element = document.getElementById(styleId);
+		if(!element){
+			element = document.createElement("style");
+			element.id = styleId;
+			document.querySelector("head").appendChild(element);
+		}
+		var html = [];
+		var resources = gantt.serverList("staff");
+
+		resources.forEach(function(r){
+			html.push(".gantt_task_line.gantt_resource_" + r.key + "{" +
+				"background-color:"+r.backgroundColor+"; " +
+				"color:"+r.textColor+";" +
+			"}");
+			html.push(".gantt_row.gantt_resource_" + r.key + " .gantt_cell:nth-child(1) .gantt_tree_content{" +
+				"background-color:"+r.backgroundColor+"; " +
+				"color:"+r.textColor+";" +
+				"}");
+		});
+		element.innerHTML = html.join("");
+	});
+
+	gantt.init("gantt_here");
+	gantt.load("../common/resource_project_2.json");
+
+
+</script>

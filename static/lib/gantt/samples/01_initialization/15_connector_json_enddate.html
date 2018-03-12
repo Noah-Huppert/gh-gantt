@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Loading using connector and JSON</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+	<style>
+		html, body {
+			height: 100%;
+			padding: 0px;
+			margin: 0px;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+<div id="gantt_here" style='width:100%; height:100%;'></div>
+<script>
+	gantt.config.xml_date = "%Y-%m-%d %H:%i:%s";
+	gantt.init("gantt_here");
+	gantt.load("../common/connector_enddate.php");
+
+	var dp = new gantt.dataProcessor("../common/connector_enddate.php");
+	dp.init(gantt);
+</script>
+</body>

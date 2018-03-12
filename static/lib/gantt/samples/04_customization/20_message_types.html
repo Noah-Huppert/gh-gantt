@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Gantt message types</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<script src="../common/testdata.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+
+	<script src="../common/testdata.js?v=20180227"></script>
+	<style>
+		html, body {
+			height: 100%;
+			padding: 0px;
+			margin: 0px;
+			overflow: hidden;
+		}
+		.buttons {
+	    	background-color: #FDFDFD;
+	    	height: 60px;
+			text-align: center;
+			line-height: 60px;
+	    }
+
+	    .buttons input {
+	    	font-weight: 600;
+	    	margin: 0px 20px;
+	    	min-width: 100px;
+	    	height: 26px;
+	    }
+	</style>
+</head>
+
+<body>	
+	
+	<div class="buttons">
+		<input type="button" value="Info" onclick="showMessage('info')"/>
+		<input type="button" value="Warning" onclick="showMessage('warning')"/>
+		<input type="button" value="Error" onclick="showMessage('error')"/>
+	</div>
+	<div id="gantt_here" style='width:100%; height:600px;'></div>
+
+	<script>
+
+		gantt.init("gantt_here");
+		gantt.parse(projects_with_milestones);
+
+		var showMessage = function(type) {
+			var text = "";
+			var countTask = gantt.getTaskCount();
+			var countLink = gantt.getLinkCount();
+			var version   = gantt.version;
+
+			text += "Tasks count: " + countTask + "<br>";
+			text += "Links count: " + countLink + "<br>";
+			text += "Gantt version: " + version;
+
+			gantt.message({type:type, text:text, expire: 10000});
+
+		}
+		gantt.message({text:"Click on the buttons to explore Gantt message types", expire:-1, type:"error"});
+
+	</script>
+</body>

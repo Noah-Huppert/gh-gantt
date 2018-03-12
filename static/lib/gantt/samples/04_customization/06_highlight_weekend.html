@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Highlighting weekends</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+
+	<script src="../common/testdata.js?v=20180227"></script>
+	<style>
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+		}
+
+		.weekend {
+			background: #f4f7f4;
+		}
+
+		.gantt_selected .weekend {
+			background: #f7eb91;
+		}
+	</style>
+</head>
+
+<body>
+<div id="gantt_here" style='width:100%; height:100%'></div>
+<script>
+	gantt.templates.scale_cell_class = function (date) {
+		if (date.getDay() == 0 || date.getDay() == 6) {
+			return "weekend";
+		}
+	};
+	gantt.templates.task_cell_class = function (item, date) {
+		if (date.getDay() == 0 || date.getDay() == 6) {
+			return "weekend"
+		}
+	};
+	gantt.init("gantt_here");
+
+	gantt.parse(demo_tasks);
+</script>
+</body>

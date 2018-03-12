@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Horizontal scroll inside Grid</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/skins/dhtmlxgantt_terrace.css?v=20180227">
+	<script src="../common/testdata.js?v=20180227"></script>
+	<style>
+		html, body {
+			height: 100%;
+			padding: 0px;
+			margin: 0px;
+			overflow: hidden;
+		}
+
+
+	</style>
+</head>
+
+<body>
+<div id="gantt_here" style='width:100%; height:100%;'></div>
+<script>
+
+	var users = [// resources
+		{key:'0', label: ""},
+		{key:'1', label: "John"},
+		{key:'2', label: "Mike"},
+		{key:'3', label: "Anna"}
+	];
+
+	function userLabelById(id){
+		for(var i = 0; i < users.length; i++){
+			if(users[i].key == id){
+				return users[i].label;
+			}
+		}
+		return "";
+	}
+
+	gantt.config.columns = [
+		{name: "wbs", label: "WBS", min_width: 50, width: 50, template: gantt.getWBSCode, resize:true},
+		{name: "id", align: "center", label: "#", min_width: 50, width: 50, resize:true},
+		{name: "text", label: "Task name", tree: true, min_width: 180, width: 200, resize:true},
+		{name: "start_date", label:"Start", align: "center", width: 100, resize:true},
+		{name: "end_date", label:"End", align: "center", width: 100, template: function(task){
+				return gantt.templates.date_grid(task.end_date, task);
+			}, resize:true},
+		{name: "user", label:"Owner",  align: "center", template: function(task){
+				return userLabelById(task.user);
+			}, width: 100, resize:true},
+		{name: "duration", align: "center", width: 80, resize:true},
+		{name: "type", label:"Type", align: "center", width: 80, template: function(task){return task.type || gantt.config.types.task}, resize:true},
+		{name: "add", width: 40}
+	];
+
+	gantt.config.scale_height = 30*2;
+	gantt.config.min_column_width = 50;
+
+	gantt.config.scale_unit = "day";
+	gantt.config.subscales = [{ unit:"month", step:1, date:"%M, %Y"	}];
+
+	gantt.config.layout = {
+		css: "gantt_container",
+		cols: [
+			{
+				width:400,
+				min_width: 300,
+				rows:[
+					{view: "grid", scrollX: "gridScroll", scrollable: true, scrollY: "scrollVer"},
+					{view: "scrollbar", id: "gridScroll", group:"horizontal"}
+				]
+			},
+			{resizer: true, width: 1},
+			{
+				rows:[
+					{view: "timeline", scrollX: "scrollHor", scrollY: "scrollVer"},
+					{view: "scrollbar", id: "scrollHor", group:"horizontal"}
+				]
+			},
+			{view: "scrollbar", id: "scrollVer"}
+		]
+	};
+
+	gantt.attachEvent("onParse", function() {		
+		gantt.eachTask(function(task) {
+			// fill 'task.user' field with random data
+			task.user = Math.round(Math.random()*3);
+			// 
+			if (gantt.hasChild(task.id))
+				task.type = gantt.config.types.project
+		});
+	});
+
+	gantt.init("gantt_here");
+	gantt.parse(demo_tasks);
+
+</script>
+</body>

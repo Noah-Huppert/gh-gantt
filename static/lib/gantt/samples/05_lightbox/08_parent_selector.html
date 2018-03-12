@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Parent selector</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+	<script src="../common/testdata.js?v=20180227"></script>
+	<style>
+		html, body {
+			height: 100%;
+			padding: 0px;
+			margin: 0px;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+<div id="gantt_here" style='width:100%; height:100%'></div>
+<script>
+	gantt.locale.labels["section_parent"] = "Parent task";
+
+	gantt.config.lightbox.sections = [
+		{name: "description", height: 38, map_to: "text", type: "textarea", focus: true},
+		{
+			name: "parent", type: "parent", allow_root: "true", root_label: "No parent", filter: function (id, task) {
+				/*	if(task.$level > 1){
+						return false;
+					}else{
+						return true;
+					}*/
+				return true;
+			}
+		},
+
+		{name: "time", type: "time", map_to: "auto", time_format: ["%d", "%m", "%Y", "%H:%i"]}
+	];
+
+	gantt.init("gantt_here");
+	gantt.parse(users_data);
+</script>
+</body>

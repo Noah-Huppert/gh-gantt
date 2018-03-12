@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<title>Draggable projects</title>
+	<script src="../../codebase/dhtmlxgantt.js?v=20180227"></script>
+	<link rel="stylesheet" href="../../codebase/dhtmlxgantt.css?v=20180227">
+
+	<script src="../common/testdata.js?v=20180227"></script>
+	<style>
+		html, body {
+			height: 100%;
+			padding: 0px;
+			margin: 0px;
+			overflow: hidden;
+		}
+	</style>
+</head>
+
+<body>
+<div id="gantt_here" style='width:100%; height:100%;'></div>
+
+
+<script>
+	gantt.config.scale_unit = "month";
+	gantt.config.date_scale = "%F, %Y";
+	gantt.config.scale_height = 50;
+
+	gantt.config.fit_tasks = true;
+	gantt.config.drag_project = true;
+
+	gantt.config.subscales = [
+		{unit: "day", step: 1, date: "%j, %D"}
+	];
+
+	gantt.templates.rightside_text = function (start, end, task) {
+		if (task.type == gantt.config.types.milestone) {
+			return task.text;
+		}
+		return "";
+	};
+	gantt.config.lightbox.sections = [
+		{name: "description", height: 70, map_to: "text", type: "textarea", focus: true},
+		{name: "type", type: "typeselect", map_to: "type"},
+		{name: "time", type: "duration", map_to: "auto"}
+	];
+	gantt.init("gantt_here");
+
+
+	gantt.parse(projects_with_milestones);
+
+</script>
+</body>

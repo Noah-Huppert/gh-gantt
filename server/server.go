@@ -35,6 +35,7 @@ func NewServer(ctx context.Context, cfg *config.Config,
 func (s Server) Registerables() []Registerable {
 
 	return []Registerable{
+		NewStaticFiles(),
 		NewIssues(s.ctx, s.cfg, s.ghClient),
 	}
 }
