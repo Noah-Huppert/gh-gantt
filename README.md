@@ -4,7 +4,7 @@ GitHub issues gantt chart generator.
 # Table Of Contents
 - [Setup](#setup)
 - [Undocumented ZenHub API Endpoints](#undocumented-zenhub-api-endpoints)
-	- [Dependences](#dependencies)
+	- [Dependences](#dependences)
 
 # Setup
 ## Configuration File
