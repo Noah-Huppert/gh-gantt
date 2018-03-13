@@ -9,32 +9,12 @@ import (
 
 	"github.com/Noah-Huppert/gh-gantt/config"
 
-	"github.com/google/go-github/github"
+	"github.com/go-redis/cache"
 )
 
-// IssueDeps holds GitHub issue dependency information.
-type IssueDeps struct {
-	// BlockedBy holds the GitHub issue numbers which are blocking the
-	// issue
-	BlockedBy []int `json:"blocked_by"`
-
-	// Blocking holds the GitHub issue numbers which are being blocked
-	// by the issue
-	Blocking []int `json:"blocking"`
-}
-
-// DepIssue is a github.Issue with fields for dependency information
-type DepIssue struct {
-	github.Issue
-	IssueDeps
-}
-
-// NewDepIssue creates a new DepIssue instance from a github.Issue and a IssueDeps
-func NewDepIssue(iss github.Issue, deps IssueDeps) DepIssue {
-	return DepIssue{
-		iss,
-		deps,
-	}
+// DepCacheKey returns the key to store cache items under
+func DepCacheKey(repoId int64, issueId int) string {
+	return fmt.Sprintf("zenhub.deps.%d.%d", repoId, issueId)
 }
 
 // DepsURL is the URL used to retrieve issue dependency information.
@@ -69,8 +49,20 @@ func extractIssueNumbers(data []map[string]interface{}) ([]int, error) {
 
 // RetrieveDeps returns an IssueDeps instance containing dependency information
 // for the specified issue. An error is returned if one occurs.
-func RetrieveDeps(ctx context.Context, cfg *config.Config, repoId int64,
-	issueId int) (IssueDeps, error) {
+func RetrieveDeps(ctx context.Context, cfg *config.Config,
+	redisClient *cache.Codec, repoId int64, issueId int) (IssueDeps, error) {
+
+	// Check if dep exists
+	var deps IssueDeps
+	cacheKey := DepCacheKey(repoId, issueId)
+
+	if err := redisClient.Get(cacheKey, &deps); (err != nil) && (err != cache.ErrCacheMiss) {
+		return IssueDeps{}, fmt.Errorf("error retrieving all ZenHub dependency"+
+			" from cache: %s", err.Error())
+	} else if err != cache.ErrCacheMiss {
+		// Cached
+		return deps, nil
+	}
 
 	// Setup ZenHub API request
 	reqUrl := fmt.Sprintf(DepsURL, repoId, issueId)
@@ -127,6 +119,17 @@ func RetrieveDeps(ctx context.Context, cfg *config.Config, repoId int64,
 		}
 
 		deps.Blocking = blocking
+
+		// Save in cache
+		if err = redisClient.Set(&cache.Item{
+			Key:        cacheKey,
+			Object:     deps,
+			Expiration: 0,
+		}); err != nil {
+
+			return IssueDeps{}, fmt.Errorf("error saving results to cache: %s",
+				err.Error())
+		}
 
 		return deps, nil
 	} else {

@@ -9,6 +9,8 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/gh"
 	"github.com/Noah-Huppert/gh-gantt/zenhub"
 	"github.com/google/go-github/github"
+
+	"github.com/go-redis/cache"
 )
 
 // IssuesPath is the base path issue handlers are registered at.
@@ -28,15 +30,20 @@ type Issues struct {
 
 	// ghClient is a GitHub API client.
 	ghClient *github.Client
+
+	// redisClient is a redis cache client
+	redisClient *cache.Codec
 }
 
 // NewIssues creates a new Issues instance with the default BasePath.
-func NewIssues(ctx context.Context, cfg *config.Config, ghClient *github.Client) Issues {
+func NewIssues(ctx context.Context, cfg *config.Config, ghClient *github.Client,
+	redisClient *cache.Codec) Issues {
 	return Issues{
-		BasePath: IssuesPath,
-		ctx:      ctx,
-		cfg:      cfg,
-		ghClient: ghClient,
+		BasePath:    IssuesPath,
+		ctx:         ctx,
+		cfg:         cfg,
+		ghClient:    ghClient,
+		redisClient: redisClient,
 	}
 }
 
@@ -48,7 +55,7 @@ func (i Issues) Register(mux *http.ServeMux) {
 // Get retrieves all GitHub issues.
 func (i Issues) Get(w http.ResponseWriter, r *http.Request) {
 	// Get repo
-	repo, err := gh.RetrieveRepo(i.ctx, i.cfg, i.ghClient)
+	repo, err := gh.RetrieveRepo(i.ctx, i.cfg, i.ghClient, i.redisClient)
 	if err != nil {
 		WriteErr(w, 500, fmt.Errorf("error retrieving GitHub repo: %s",
 			err.Error()))
@@ -56,7 +63,7 @@ func (i Issues) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get issues
-	issues, err := gh.RetrieveIssues(i.ctx, i.cfg, i.ghClient)
+	issues, err := gh.RetrieveIssues(i.ctx, i.cfg, i.ghClient, i.redisClient)
 	if err != nil {
 		WriteErr(w, 500, fmt.Errorf("error retrieving GitHub issues: %s",
 			err.Error()))
@@ -66,7 +73,9 @@ func (i Issues) Get(w http.ResponseWriter, r *http.Request) {
 	// Get issue dependencies
 	depIssues := []zenhub.DepIssue{}
 	for _, issue := range issues {
-		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, *repo.ID, *issue.Number)
+		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, i.redisClient,
+			*repo.ID, *issue.Number)
+
 		if err != nil {
 			WriteErr(w, 500, fmt.Errorf("error retrieving "+
 				"issue dependencies, issue #: %d, err: %s",
