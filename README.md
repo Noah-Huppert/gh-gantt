@@ -56,9 +56,9 @@ Body:
 
 - `caches` (`[]String`): Name of caches to purge.  
 		       Valid values are:
-		           - `github.issues`
-			   - `github.repo`
-			   - `zenhub.dependencies`
+		           - `github.issues`  
+			   - `github.repo`  
+			   - `zenhub.dependencies`  
 
 #### Response
 Body:
