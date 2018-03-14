@@ -16,8 +16,8 @@ import (
 // IssuesPath is the base path issue handlers are registered at.
 const IssuesPath string = "/api/issues"
 
-// Issues implements HTTP handlers for GitHub issues
-type Issues struct {
+// IssuesEndpoint implements HTTP handlers for GitHub issues
+type IssuesEndpoint struct {
 	// BasePath is the location issue handlers will be registered at
 	BasePath string
 
@@ -35,10 +35,10 @@ type Issues struct {
 	redisClient *cache.Codec
 }
 
-// NewIssues creates a new Issues instance with the default BasePath.
-func NewIssues(ctx context.Context, cfg *config.Config, ghClient *github.Client,
-	redisClient *cache.Codec) Issues {
-	return Issues{
+// NewIssuesEndpoint creates a new IssuesEndpoint instance with the default BasePath.
+func NewIssuesEndpoint(ctx context.Context, cfg *config.Config, ghClient *github.Client,
+	redisClient *cache.Codec) IssuesEndpoint {
+	return IssuesEndpoint{
 		BasePath:    IssuesPath,
 		ctx:         ctx,
 		cfg:         cfg,
@@ -48,12 +48,12 @@ func NewIssues(ctx context.Context, cfg *config.Config, ghClient *github.Client,
 }
 
 // Register implements Registerable.Register
-func (i Issues) Register(mux *http.ServeMux) {
+func (i IssuesEndpoint) Register(mux *http.ServeMux) {
 	mux.HandleFunc(i.BasePath, i.Get)
 }
 
 // Get retrieves all GitHub issues.
-func (i Issues) Get(w http.ResponseWriter, r *http.Request) {
+func (i IssuesEndpoint) Get(w http.ResponseWriter, r *http.Request) {
 	// Get repo
 	repo, err := gh.RetrieveRepo(i.ctx, i.cfg, i.ghClient, i.redisClient)
 	if err != nil {

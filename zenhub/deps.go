@@ -14,7 +14,7 @@ import (
 
 // DepCacheKey returns the key to store cache items under
 func DepCacheKey(repoId int64, issueId int) string {
-	return fmt.Sprintf("zenhub.deps.%d.%d", repoId, issueId)
+	return fmt.Sprintf("zenhub.dependencies.%d.%d", repoId, issueId)
 }
 
 // DepsURL is the URL used to retrieve issue dependency information.

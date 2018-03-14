@@ -4,6 +4,9 @@ GitHub issues gantt chart generator.
 
 # Table Of Contents
 - [Overview](#overview)
+- [API](#api)
+	- [Issues Endpoints](#issues-endpoints)
+	- [Cache Control Endpoints](#cache-control-endpoints)
 - [Setup](#setup)
 - [Undocumented ZenHub API Endpoints](#undocumented-zenhub-api-endpoints)
 	- [Dependences](#dependences)
@@ -17,6 +20,52 @@ Current status: Heavy development, screenshot:
 
 <img alt="Gantt chart generated with gh-gantt tool" width="400" src="/static/img/screenshot.png">
 
+# API
+The GitHub Gantt project provides an API to retrieve GitHub issue information.  
+
+## Issues Endpoints
+### Get All
+GET `/api/issues`  
+
+Retrieves all GitHub issues.  
+
+#### Request
+No parameters.
+
+#### Response
+Body:  
+
+- `issues` ([]zenhub.DepIssue): List of GitHub issues
+	- A `zenhub.DepIssue` is a 
+	  [GitHub Issue](https://godoc.org/github.com/google/go-github/github#Issue) 
+	  with additional `blocking` and `blocked_by` fields. Which indicate 
+	  dependency information.
+- `errors` ([]String): Array of error messages. Always empty when HTTP code 200.
+
+## Cache Control Endpoints
+GitHub Gantt caches responses from the GitHub and ZenHub APIs. 
+
+### Purge
+POST `/api/cache/purge`  
+
+Deletes items from specified caches. Forces GitHub Gantt to retrieve the 
+latest 3rd party API data.  
+
+#### Request
+Body:  
+
+- `caches` ([]String): Name of caches to purge.  
+		       Valid values are:
+		       	
+		           - `github.issues`
+			   - `github.repo`
+			   - `zenhub.dependencies`
+
+#### Response
+Body:
+
+- `errors` ([]String): Array of error messages. Always empty when HTTP code 200.
+
 # Setup
 ## Configuration File
 Make a copy of `config.ex.toml` named `config.toml` and fill it in with your 
@@ -24,6 +73,8 @@ own values.
 
 - HTTP: Web server configuration
 	- Port: Port to handle HTTP traffic from
+- Redis: Redis server configuratiojn
+	- Host: Host of Redis server to connect to
 - GitHub: Configuration related to GitHub issues API
 	- AccessToken: GitHub API access token used to retrieve repo issues
 	- RepoOwner: Login of GitHub user who owns repository

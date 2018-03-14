@@ -40,7 +40,8 @@ func (s Server) Registerables() []Registerable {
 
 	return []Registerable{
 		NewStaticFiles(),
-		NewIssues(s.ctx, s.cfg, s.ghClient, s.redisClient),
+		NewIssuesEndpoint(s.ctx, s.cfg, s.ghClient, s.redisClient),
+		NewPurgeEndpoint(),
 	}
 }
 

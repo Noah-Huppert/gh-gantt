@@ -11,7 +11,7 @@ import (
 )
 
 // IssuesCacheKey is the key all GitHub issues will be stored in the cache
-const IssuesCacheKey string = "gh.issues"
+const IssuesCacheKey string = "github.issues"
 
 // RetrieveIssues returns all open issues in a GitHub repository
 func RetrieveIssues(ctx context.Context, cfg *config.Config,

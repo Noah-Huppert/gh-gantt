@@ -12,7 +12,7 @@ import (
 )
 
 // RepoCacheKey is the key to the store repository in cache under
-const RepoCacheKey string = "gh.repo"
+const RepoCacheKey string = "github.repo"
 
 // RetrieveRepo returns the repository specified in the configuration. An
 // error is returned if one occurs.
