@@ -55,7 +55,7 @@ latest 3rd party API data.
 Body:  
 
 - `caches` (`[]String`): Name of caches to purge.  
-		       Valid values are:
+		       Valid values are:  
 		           - `github.issues`  
 			   - `github.repo`  
 			   - `zenhub.dependencies`  
