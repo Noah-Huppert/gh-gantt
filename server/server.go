@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-github/github"
 
 	"github.com/go-redis/cache"
+	"github.com/go-redis/redis"
 
 	"github.com/gorilla/mux"
 )
@@ -21,18 +22,21 @@ type Server struct {
 	ctx         context.Context
 	cfg         *config.Config
 	ghClient    *github.Client
-	redisCache *cache.Codec
+	redisClient *redis.Client
+	redisCache  *cache.Codec
 }
 
 // NewServer creates a new Server instance.
 func NewServer(ctx context.Context, cfg *config.Config,
-	ghClient *github.Client, redisCache *cache.Codec) Server {
+	ghClient *github.Client, redisClient *redis.Client,
+	redisCache *cache.Codec) Server {
 
 	return Server{
 		ctx:         ctx,
 		cfg:         cfg,
 		ghClient:    ghClient,
-		redisCache: redisCache,
+		redisClient: redisClient,
+		redisCache:  redisCache,
 	}
 }
 
@@ -42,8 +46,8 @@ func (s Server) Registerables() []Registerable {
 
 	return []Registerable{
 		NewStaticFiles(),
-		NewIssuesEndpoint(s.ctx, s.cfg, s.ghClient, s.redisCache),
-		NewPurgeEndpoint(s.redisCache),
+		NewIssuesEndpoint(s.ctx, s.cfg, s.ghClient, s.redisClient, s.redisCache),
+		NewPurgeEndpoint(s.redisClient, s.redisCache),
 		NewNotFoundHandler(),
 	}
 }

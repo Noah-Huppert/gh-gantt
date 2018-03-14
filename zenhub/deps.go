@@ -10,7 +10,16 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/config"
 
 	"github.com/go-redis/cache"
+	"github.com/go-redis/redis"
 )
+
+// DepsCategoryKey indicates that an API request is referring to all issue
+// dependency models stored in the cache
+const DepsCategoryKey string = "zenhub.dependencies"
+
+// DepKeysKey is the name of the Redis set which holds the DepCacheKey keys
+// which are present in the cache.
+const DepKeysKey string = "zenhub.dependencies.keys"
 
 // DepCacheKey returns the key to store cache items under
 func DepCacheKey(repoId int64, issueId int) string {
@@ -50,7 +59,8 @@ func extractIssueNumbers(data []map[string]interface{}) ([]int, error) {
 // RetrieveDeps returns an IssueDeps instance containing dependency information
 // for the specified issue. An error is returned if one occurs.
 func RetrieveDeps(ctx context.Context, cfg *config.Config,
-	redisCache *cache.Codec, repoId int64, issueId int) (IssueDeps, error) {
+	redisClient *redis.Client, redisCache *cache.Codec, repoId int64,
+	issueId int) (IssueDeps, error) {
 
 	// Check if dep exists
 	var deps IssueDeps
@@ -127,8 +137,14 @@ func RetrieveDeps(ctx context.Context, cfg *config.Config,
 			Expiration: 0,
 		}); err != nil {
 
-			return IssueDeps{}, fmt.Errorf("error saving results to cache: %s",
-				err.Error())
+			return IssueDeps{}, fmt.Errorf("error saving results"+
+				" to cache: %s", err.Error())
+		}
+
+		if err = redisClient.SAdd(DepKeysKey, cacheKey).Err(); err != nil {
+			return IssueDeps{}, fmt.Errorf("error saving cache "+
+				"key to dependencies keys set, key: %s, err: %s",
+				cacheKey, err.Error())
 		}
 
 		return deps, nil

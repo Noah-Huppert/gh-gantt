@@ -1,5 +1,5 @@
 .PHONY: run \
-	redis
+	redis redis-clean
 
 MAIN_FILE=main.go
 
@@ -18,5 +18,9 @@ redis:
 		--rm \
 		--net host \
 		-p 6379:6379 \
-		-v "$(shell pwd)/${REDIS_DIR}" \
-		redis:alpine
+		-v "$(shell pwd)/${REDIS_DIR}":/data \
+		redis:alpine --appendonly yes
+
+# redis-clean removes all persistence files Redis creates
+redis-clean:
+	rm -rf "${REDIS_DIR}"

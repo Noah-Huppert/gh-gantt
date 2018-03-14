@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Noah-Huppert/gh-gantt/cache"
 	"github.com/Noah-Huppert/gh-gantt/gh"
+	"github.com/Noah-Huppert/gh-gantt/zenhub"
 
-	"github.com/go-redis/cache"
+	cacheLib "github.com/go-redis/cache"
+	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 )
 
@@ -18,15 +21,20 @@ type PurgeEndpoint struct {
 	// BasePath is the URL HTTP Purge handlers will be registered at
 	BasePath string
 
+	// redisClient is the Redis client used to purge parts of the redis cache
+	redisClient *redis.Client
+
 	// redisCache is the Redis client used to access the cache store
-	redisCache *cache.Codec
+	redisCache *cacheLib.Codec
 }
 
 // NewPurgeEndpoint creates a new PurgeEndpoint instance
-func NewPurgeEndpoint(redisCache *cache.Codec) *PurgeEndpoint {
+func NewPurgeEndpoint(redisClient *redis.Client, redisCache *cacheLib.Codec) *PurgeEndpoint {
+
 	return &PurgeEndpoint{
-		BasePath:   PurgePath,
-		redisCache: redisCache,
+		BasePath:    PurgePath,
+		redisClient: redisClient,
+		redisCache:  redisCache,
 	}
 }
 
@@ -35,20 +43,46 @@ func (p PurgeEndpoint) Register(router *mux.Router) {
 	router.HandleFunc(p.BasePath, p.Post).Methods("POST")
 }
 
-// zenhubDepsCache is the value passed in the `caches` body field to clear all
-// ZenHub dependencies from the cache
-const zenhubDepsCache string = "zenhub.dependencies"
-
 // allowedCacheNames are the values allowed in the `caches` body parameter
 var allowedCacheNames []string = []string{gh.IssuesCacheKey, gh.RepoCacheKey,
-	zenhubDepsCache}
+	zenhub.DepsCategoryKey}
+
+// purgeBody is the structure purge post request bodies will be serialized into.
+type purgeBody struct {
+	caches []string
+}
 
 // Post handles purge endpoint post requests
 func (p PurgeEndpoint) Post(w http.ResponseWriter, r *http.Request) {
 	if RequireBodyFields(w, r, []string{"caches"}) {
-		caches := r.Form["caches"]
+		// Parse body
+		body := purgeBody{}
+		err := ParseBody(r, &body)
+
+		if err != nil {
+			WriteErr(w, 500, fmt.Errorf("error reading body: %s",
+				err.Error()))
+			return
+		}
+
+		caches := body.caches
 
 		// Delete
-		fmt.Fprintf(w, "purge %s", caches)
+		for _, cacheName := range caches {
+			if err := cache.PurgeCache(p.redisClient, p.redisCache,
+				cacheName); err != nil {
+
+				WriteErr(w, 500, fmt.Errorf("error "+
+					"purging cache: %s, err: %s",
+					cacheName, err.Error()))
+				return
+			}
+		}
+
+		// Success
+		resp := map[string]interface{}{
+			"errors": []string{},
+		}
+		WriteJSON(w, 200, resp)
 	}
 }

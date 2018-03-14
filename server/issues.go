@@ -11,6 +11,7 @@ import (
 	"github.com/google/go-github/github"
 
 	"github.com/go-redis/cache"
+	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 )
 
@@ -32,19 +33,23 @@ type IssuesEndpoint struct {
 	// ghClient is a GitHub API client.
 	ghClient *github.Client
 
+	// redisClient is a redis client used by issue endpoints
+	redisClient *redis.Client
+
 	// redisCache is a redis cache client
 	redisCache *cache.Codec
 }
 
 // NewIssuesEndpoint creates a new IssuesEndpoint instance with the default BasePath.
 func NewIssuesEndpoint(ctx context.Context, cfg *config.Config, ghClient *github.Client,
-	redisCache *cache.Codec) IssuesEndpoint {
+	redisClient *redis.Client, redisCache *cache.Codec) IssuesEndpoint {
 	return IssuesEndpoint{
 		BasePath:    IssuesPath,
 		ctx:         ctx,
 		cfg:         cfg,
 		ghClient:    ghClient,
-		redisCache: redisCache,
+		redisClient: redisClient,
+		redisCache:  redisCache,
 	}
 }
 
@@ -74,8 +79,8 @@ func (i IssuesEndpoint) Get(w http.ResponseWriter, r *http.Request) {
 	// Get issue dependencies
 	depIssues := []zenhub.DepIssue{}
 	for _, issue := range issues {
-		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, i.redisCache,
-			*repo.ID, *issue.Number)
+		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, i.redisClient,
+			i.redisCache, *repo.ID, *issue.Number)
 
 		if err != nil {
 			WriteErr(w, 500, fmt.Errorf("error retrieving "+
