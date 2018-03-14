@@ -50,13 +50,13 @@ func extractIssueNumbers(data []map[string]interface{}) ([]int, error) {
 // RetrieveDeps returns an IssueDeps instance containing dependency information
 // for the specified issue. An error is returned if one occurs.
 func RetrieveDeps(ctx context.Context, cfg *config.Config,
-	redisClient *cache.Codec, repoId int64, issueId int) (IssueDeps, error) {
+	redisCache *cache.Codec, repoId int64, issueId int) (IssueDeps, error) {
 
 	// Check if dep exists
 	var deps IssueDeps
 	cacheKey := DepCacheKey(repoId, issueId)
 
-	if err := redisClient.Get(cacheKey, &deps); (err != nil) && (err != cache.ErrCacheMiss) {
+	if err := redisCache.Get(cacheKey, &deps); (err != nil) && (err != cache.ErrCacheMiss) {
 		return IssueDeps{}, fmt.Errorf("error retrieving all ZenHub dependency"+
 			" from cache: %s", err.Error())
 	} else if err != cache.ErrCacheMiss {
@@ -121,7 +121,7 @@ func RetrieveDeps(ctx context.Context, cfg *config.Config,
 		deps.Blocking = blocking
 
 		// Save in cache
-		if err = redisClient.Set(&cache.Item{
+		if err = redisCache.Set(&cache.Item{
 			Key:        cacheKey,
 			Object:     deps,
 			Expiration: 0,

@@ -11,6 +11,7 @@ import (
 	"github.com/google/go-github/github"
 
 	"github.com/go-redis/cache"
+	"github.com/gorilla/mux"
 )
 
 // IssuesPath is the base path issue handlers are registered at.
@@ -31,31 +32,31 @@ type IssuesEndpoint struct {
 	// ghClient is a GitHub API client.
 	ghClient *github.Client
 
-	// redisClient is a redis cache client
-	redisClient *cache.Codec
+	// redisCache is a redis cache client
+	redisCache *cache.Codec
 }
 
 // NewIssuesEndpoint creates a new IssuesEndpoint instance with the default BasePath.
 func NewIssuesEndpoint(ctx context.Context, cfg *config.Config, ghClient *github.Client,
-	redisClient *cache.Codec) IssuesEndpoint {
+	redisCache *cache.Codec) IssuesEndpoint {
 	return IssuesEndpoint{
 		BasePath:    IssuesPath,
 		ctx:         ctx,
 		cfg:         cfg,
 		ghClient:    ghClient,
-		redisClient: redisClient,
+		redisCache: redisCache,
 	}
 }
 
 // Register implements Registerable.Register
-func (i IssuesEndpoint) Register(mux *http.ServeMux) {
-	mux.HandleFunc(i.BasePath, i.Get)
+func (i IssuesEndpoint) Register(router *mux.Router) {
+	router.HandleFunc(i.BasePath, i.Get).Methods("GET")
 }
 
 // Get retrieves all GitHub issues.
 func (i IssuesEndpoint) Get(w http.ResponseWriter, r *http.Request) {
 	// Get repo
-	repo, err := gh.RetrieveRepo(i.ctx, i.cfg, i.ghClient, i.redisClient)
+	repo, err := gh.RetrieveRepo(i.ctx, i.cfg, i.ghClient, i.redisCache)
 	if err != nil {
 		WriteErr(w, 500, fmt.Errorf("error retrieving GitHub repo: %s",
 			err.Error()))
@@ -63,7 +64,7 @@ func (i IssuesEndpoint) Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get issues
-	issues, err := gh.RetrieveIssues(i.ctx, i.cfg, i.ghClient, i.redisClient)
+	issues, err := gh.RetrieveIssues(i.ctx, i.cfg, i.ghClient, i.redisCache)
 	if err != nil {
 		WriteErr(w, 500, fmt.Errorf("error retrieving GitHub issues: %s",
 			err.Error()))
@@ -73,7 +74,7 @@ func (i IssuesEndpoint) Get(w http.ResponseWriter, r *http.Request) {
 	// Get issue dependencies
 	depIssues := []zenhub.DepIssue{}
 	for _, issue := range issues {
-		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, i.redisClient,
+		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, i.redisCache,
 			*repo.ID, *issue.Number)
 
 		if err != nil {

@@ -15,12 +15,12 @@ const IssuesCacheKey string = "github.issues"
 
 // RetrieveIssues returns all open issues in a GitHub repository
 func RetrieveIssues(ctx context.Context, cfg *config.Config,
-	ghClient *github.Client, redisClient *cache.Codec) ([]*github.Issue, error) {
+	ghClient *github.Client, redisCache *cache.Codec) ([]*github.Issue, error) {
 
 	// Check if issue exists
 	var issues []*github.Issue
 
-	if err := redisClient.Get(IssuesCacheKey, &issues); (err != nil) && (err != cache.ErrCacheMiss) {
+	if err := redisCache.Get(IssuesCacheKey, &issues); (err != nil) && (err != cache.ErrCacheMiss) {
 		return nil, fmt.Errorf("error retrieving all GitHub issues "+
 			"from cache: %s", err.Error())
 	} else if err != cache.ErrCacheMiss {
@@ -38,7 +38,7 @@ func RetrieveIssues(ctx context.Context, cfg *config.Config,
 	}
 
 	// Save in cache
-	if err = redisClient.Set(&cache.Item{
+	if err = redisCache.Set(&cache.Item{
 		Key:        IssuesCacheKey,
 		Object:     issues,
 		Expiration: 0,

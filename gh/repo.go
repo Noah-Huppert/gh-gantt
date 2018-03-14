@@ -17,12 +17,12 @@ const RepoCacheKey string = "github.repo"
 // RetrieveRepo returns the repository specified in the configuration. An
 // error is returned if one occurs.
 func RetrieveRepo(ctx context.Context, cfg *config.Config,
-	ghClient *github.Client, redisClient *cache.Codec) (*github.Repository, error) {
+	ghClient *github.Client, redisCache *cache.Codec) (*github.Repository, error) {
 
 	// Check if cached
 	var repo *github.Repository
 
-	if err := redisClient.Get(RepoCacheKey, &repo); (err != nil) &&
+	if err := redisCache.Get(RepoCacheKey, &repo); (err != nil) &&
 		(err != cache.ErrCacheMiss) {
 
 		return nil, fmt.Errorf("error retrieving repo from cache: %s",
@@ -42,7 +42,7 @@ func RetrieveRepo(ctx context.Context, cfg *config.Config,
 	}
 
 	// Save in cache
-	if err := redisClient.Set(&cache.Item{
+	if err := redisCache.Set(&cache.Item{
 		Key:        RepoCacheKey,
 		Object:     repo,
 		Expiration: 0,
