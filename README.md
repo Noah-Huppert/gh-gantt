@@ -11,10 +11,10 @@ GitHub issues gantt chart generator.
 - [Undocumented ZenHub API Endpoints](#undocumented-zenhub-api-endpoints)
 	- [Dependences](#dependences)
 # Overview
-Creates a Gantt chart from a GitHub repositories issues. Uses ZenHub to 
+Creates a Gantt chart from GitHub repository issues. Uses ZenHub to 
 retrieve the dependency information necessary to create a Gantt chart.  
 
-The scheduling of tasks is determined by the Milestone they are in.  
+The scheduling of tasks is determined by which Milestone they are in.  
 
 Current status: Heavy development, screenshot:  
 
@@ -24,7 +24,7 @@ Current status: Heavy development, screenshot:
 The GitHub Gantt project provides an API to retrieve GitHub issue information.  
 
 ## Issues Endpoints
-### Get All
+### Get All Issues
 GET `/api/issues`  
 
 Retrieves all GitHub issues.  
@@ -35,17 +35,17 @@ No parameters.
 #### Response
 Body:  
 
-- `issues` ([]zenhub.DepIssue): List of GitHub issues
+- `issues` (`[]zenhub.DepIssue`): List of GitHub issues
 	- A `zenhub.DepIssue` is a 
 	  [GitHub Issue](https://godoc.org/github.com/google/go-github/github#Issue) 
 	  with additional `blocking` and `blocked_by` fields. Which indicate 
 	  dependency information.
-- `errors` ([]String): Array of error messages. Always empty when HTTP code 200.
+- `errors` (`[]String`): Array of error messages. Always empty when HTTP code 200.
 
 ## Cache Control Endpoints
 GitHub Gantt caches responses from the GitHub and ZenHub APIs. 
 
-### Purge
+### Purge Cache
 POST `/api/cache/purge`  
 
 Deletes items from specified caches. Forces GitHub Gantt to retrieve the 
@@ -54,9 +54,8 @@ latest 3rd party API data.
 #### Request
 Body:  
 
-- `caches` ([]String): Name of caches to purge.  
+- `caches` (`[]String`): Name of caches to purge.  
 		       Valid values are:
-		       	
 		           - `github.issues`
 			   - `github.repo`
 			   - `zenhub.dependencies`
@@ -64,7 +63,7 @@ Body:
 #### Response
 Body:
 
-- `errors` ([]String): Array of error messages. Always empty when HTTP code 200.
+- `errors` (`[]String`): Array of error messages. Always empty when HTTP code 200.
 
 # Setup
 ## Configuration File
