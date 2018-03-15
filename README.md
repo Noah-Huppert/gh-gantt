@@ -82,10 +82,10 @@ own values.
 - ZenHub:
 	- APIToken: ZenHub API access token  
 	            Must retrieve special ZenHub authentication token by:  
-		    	- [Navigating to app.zenhub.com](https://app.zenhub.com)
-			- Run in the console  
-			  ```js
-			  window.localStorage.getItem("api_token")
+		- [Navigating to app.zenhub.com](https://app.zenhub.com)  
+		- Run in the console  
+		  ```js
+		  window.localStorage.getItem("api_token")
 			  ```
 
 # Undocument ZenHub API Endpoints
