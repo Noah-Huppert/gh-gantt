@@ -31,5 +31,5 @@ func NewStaticFiles() StaticFiles {
 
 // Register implements Registerable.Register
 func (s StaticFiles) Register(router *mux.Router) {
-	router.Handle(s.BaseURL, http.FileServer(http.Dir(s.Dir)))
+	router.PathPrefix(s.BaseURL).Handler(http.FileServer(http.Dir(s.Dir)))
 }

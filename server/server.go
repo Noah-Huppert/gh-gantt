@@ -45,10 +45,10 @@ func NewServer(ctx context.Context, cfg *config.Config,
 func (s Server) Registerables() []Registerable {
 
 	return []Registerable{
-		NewStaticFiles(),
+		NewNotFoundHandler(),
 		NewIssuesEndpoint(s.ctx, s.cfg, s.ghClient, s.redisClient, s.redisCache),
 		NewPurgeEndpoint(s.redisClient, s.redisCache),
-		NewNotFoundHandler(),
+		NewStaticFiles(),
 	}
 }
 
