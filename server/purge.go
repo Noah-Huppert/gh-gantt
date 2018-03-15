@@ -49,7 +49,8 @@ var allowedCacheNames []string = []string{gh.IssuesCacheKey, gh.RepoCacheKey,
 
 // purgeBody is the structure purge post request bodies will be serialized into.
 type purgeBody struct {
-	caches []string
+	// Caches holds the names of the caches to purge
+	Caches []string `json:"caches"`
 }
 
 // Post handles purge endpoint post requests
@@ -65,10 +66,24 @@ func (p PurgeEndpoint) Post(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		caches := body.caches
-
 		// Delete
-		for _, cacheName := range caches {
+		purged := []string{}
+
+		for _, cacheName := range body.Caches {
+			// Ensure valid cache name
+			valid := false
+			for _, validName := range allowedCacheNames {
+				if validName == cacheName {
+					valid = true
+				}
+			}
+
+			if !valid {
+				WriteErr(w, 500, fmt.Errorf("unknown cache: %s",
+					cacheName))
+				return
+			}
+
 			if err := cache.PurgeCache(p.redisClient, p.redisCache,
 				cacheName); err != nil {
 
@@ -77,10 +92,13 @@ func (p PurgeEndpoint) Post(w http.ResponseWriter, r *http.Request) {
 					cacheName, err.Error()))
 				return
 			}
+
+			purged = append(purged, cacheName)
 		}
 
 		// Success
 		resp := map[string]interface{}{
+			"purged": purged,
 			"errors": []string{},
 		}
 		WriteJSON(w, 200, resp)

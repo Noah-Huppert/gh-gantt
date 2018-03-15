@@ -63,6 +63,7 @@ Body:
 #### Response
 Body:
 
+- `purged` (`[]String`): Array of caches which were successfully purged
 - `errors` (`[]String`): Array of error messages. Always empty when HTTP code 200.
 
 # Setup

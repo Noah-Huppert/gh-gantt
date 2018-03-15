@@ -1,20 +1,34 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
 
 // ParseBody parses a request's body from JSON form into a map.
 // An error is returned if one occurs
 func ParseBody(r *http.Request, body interface{}) error {
-	decoder := json.NewDecoder(r.Body)
-
-	if err := decoder.Decode(&body); err != nil {
-		return fmt.Errorf("error decoding JSON body: %s",
-			err.Error())
+	if r.Body == nil {
+		return errors.New("no body")
 	}
+
+	// Read body
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return fmt.Errorf("error reading body: %s", err.Error())
+	}
+
+	// Decode body
+	if err := json.Unmarshal(data, body); err != nil {
+		return fmt.Errorf("error unmarshalling JSON: %s", err.Error())
+	}
+
+	// Restore body
+	r.Body = ioutil.NopCloser(bytes.NewBuffer(data))
 
 	return nil
 }

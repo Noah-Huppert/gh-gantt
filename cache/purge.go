@@ -23,6 +23,8 @@ func PurgeCache(redisClient *redis.Client, redisCache *cache.Codec,
 			return fmt.Errorf("error deleting cache category: %s",
 				err.Error())
 		}
+
+		return nil
 	}
 
 	// Otherwise clear cache normally
@@ -42,16 +44,18 @@ func PurgeCache(redisClient *redis.Client, redisCache *cache.Codec,
 func PurgeCacheCategory(redisClient *redis.Client, redisCache *cache.Codec,
 	keysKey string) error {
 
-	// Get members of instance keys set
-	keys, err := redisClient.SMembers(keysKey).Result()
-	if err != nil {
-		return fmt.Errorf("error retrieving instance keys from set: "+
-			"%s, err: %s", keysKey, err.Error())
-	}
-
 	// Delete each key
-	for _, key := range keys {
-		err := PurgeCache(redisClient, redisCache, key)
+	var popErr error
+	for popErr != redis.Nil {
+		key, err := redisClient.SPop(zenhub.DepKeysKey).Result()
+		if err == redis.Nil {
+			break
+		} else if err != nil {
+			return fmt.Errorf("error popping model key from "+
+				"model instance key set: %s", err.Error())
+		}
+
+		err = PurgeCache(redisClient, redisCache, key)
 		if err != nil {
 			return fmt.Errorf("error deleting cache category key: "+
 				"%s, err: %s", key, err.Error())
