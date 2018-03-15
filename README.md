@@ -86,7 +86,7 @@ own values.
 		- Run in the console  
 		  ```js
 		  window.localStorage.getItem("api_token")
-			  ```
+		  ```
 
 # Undocument ZenHub API Endpoints
 ZenHub documents many of their endpoints. However some have not been documented, 
