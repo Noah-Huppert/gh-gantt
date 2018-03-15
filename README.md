@@ -81,9 +81,9 @@ own values.
 	- RepoName: Name of GitHub repository to retrieve issues from
 - ZenHub:
 	- APIToken: ZenHub API access token  
-	            Must retrieve special ZenHub authentication token by:
+	            Must retrieve special ZenHub authentication token by:  
 		    	- [Navigating to app.zenhub.com](https://app.zenhub.com)
-			- Run in the console
+			- Run in the console  
 			  ```js
 			  window.localStorage.getItem("api_token")
 			  ```
