@@ -61,7 +61,7 @@ function drawChart() {
 					end,
 					daysToMilliseconds(1), 
 					0,
-					deps
+					""//deps
 				]);
 			}
 			data.addRows(rows);

@@ -30,8 +30,17 @@ func main() {
 	ghClient := gh.NewClient(ctx, cfg)
 
 	// Redis clients
-	redisClient := redis.NewClient(cfg)
-	redisCache := cache.NewClient(cfg)
+	redisClient, err := redis.NewClient(cfg)
+	if err != nil {
+		logger.Fatalf("error creating Redis client: %s", err.Error())
+	}
+
+	redisCache, err := cache.NewClient(cfg)
+	if err != nil {
+		logger.Fatalf("error creating Redis cache client: %s", err.Error())
+	}
+
+	logger.Printf("connected to Redis host")
 
 	// Server
 	logger.Printf("starting server")
