@@ -6,7 +6,6 @@ GitHub issues gantt chart generator.
 - [Overview](#overview)
 - [API](#api)
 	- [Issues Endpoints](#issues-endpoints)
-	- [Cache Control Endpoints](#cache-control-endpoints)
 - [Setup](#setup)
 - [Undocumented ZenHub API Endpoints](#undocumented-zenhub-api-endpoints)
 	- [Dependences](#dependences)
@@ -40,30 +39,6 @@ Body:
 	  [GitHub Issue](https://godoc.org/github.com/google/go-github/github#Issue) 
 	  with additional `blocking` and `blocked_by` fields. Which indicate 
 	  dependency information.
-- `errors` (`[]String`): Array of error messages. Always empty when HTTP code 200.
-
-## Cache Control Endpoints
-GitHub Gantt caches responses from the GitHub and ZenHub APIs. 
-
-### Purge Cache
-POST `/api/cache/purge`  
-
-Deletes items from specified caches. Forces GitHub Gantt to retrieve the 
-latest 3rd party API data.  
-
-#### Request
-Body:  
-
-- `caches` (`[]String`): Name of caches to purge.  
-		       Valid values are:  
-		           - `github.issues`  
-			   - `github.repo`  
-			   - `zenhub.dependencies`  
-
-#### Response
-Body:
-
-- `purged` (`[]String`): Array of caches which were successfully purged
 - `errors` (`[]String`): Array of error messages. Always empty when HTTP code 200.
 
 # Setup
