@@ -1,6 +1,9 @@
 [HTTP]
 Port = 8000
 
+[Redis]
+Host = ":6379"
+
 [GitHub]
 AccessToken = "GitHub access token"
 RepoOwner = "Owner"

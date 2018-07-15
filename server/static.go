@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 // StaticDir is the directory to serve static files from
@@ -28,6 +30,6 @@ func NewStaticFiles() StaticFiles {
 }
 
 // Register implements Registerable.Register
-func (s StaticFiles) Register(mux *http.ServeMux) {
-	mux.Handle(s.BaseURL, http.FileServer(http.Dir(s.Dir)))
+func (s StaticFiles) Register(router *mux.Router) {
+	router.PathPrefix(s.BaseURL).Handler(http.FileServer(http.Dir(s.Dir)))
 }

@@ -7,10 +7,9 @@ import (
 
 	"github.com/Noah-Huppert/gh-gantt/config"
 	"github.com/google/go-github/github"
-)
 
-// TODO: Make Server struct
-// TODO: Make static files handler
+	"github.com/gorilla/mux"
+)
 
 // Server wraps the HTTP server functionality
 type Server struct {
@@ -35,29 +34,30 @@ func NewServer(ctx context.Context, cfg *config.Config,
 func (s Server) Registerables() []Registerable {
 
 	return []Registerable{
+		NewNotFoundHandler(),
+		NewIssuesEndpoint(s.ctx, s.cfg, s.ghClient),
 		NewStaticFiles(),
-		NewIssues(s.ctx, s.cfg, s.ghClient),
 	}
 }
 
-// Routes returns a http.ServeMux with all the server route handlers.
-func (s Server) Routes() *http.ServeMux {
-	mux := http.NewServeMux()
+// Routes returns a mux.Router with all the server route handlers.
+func (s Server) Routes() *mux.Router {
+	router := mux.NewRouter()
 
 	regs := s.Registerables()
 	for _, reg := range regs {
-		reg.Register(mux)
+		reg.Register(router)
 	}
 
-	return mux
+	return router
 }
 
 func (s Server) Start() error {
-	mux := s.Routes()
+	router := s.Routes()
 
 	portStr := fmt.Sprintf(":%d", s.cfg.HTTP.Port)
 
-	err := http.ListenAndServe(portStr, mux)
+	err := http.ListenAndServe(portStr, router)
 	if err != nil {
 		return fmt.Errorf("error starting server: %s", err.Error())
 	}

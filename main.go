@@ -28,7 +28,7 @@ func main() {
 	ghClient := gh.NewClient(ctx, cfg)
 
 	// Server
-	logger.Printf("starting server")
+	logger.Printf("starting server on :%d", cfg.HTTP.Port)
 
 	srv := server.NewServer(ctx, cfg, ghClient)
 

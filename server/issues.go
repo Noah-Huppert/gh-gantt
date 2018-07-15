@@ -9,13 +9,15 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/gh"
 	"github.com/Noah-Huppert/gh-gantt/zenhub"
 	"github.com/google/go-github/github"
+
+	"github.com/gorilla/mux"
 )
 
 // IssuesPath is the base path issue handlers are registered at.
 const IssuesPath string = "/api/issues"
 
-// Issues implements HTTP handlers for GitHub issues
-type Issues struct {
+// IssuesEndpoint implements HTTP handlers for GitHub issues
+type IssuesEndpoint struct {
 	// BasePath is the location issue handlers will be registered at
 	BasePath string
 
@@ -30,9 +32,10 @@ type Issues struct {
 	ghClient *github.Client
 }
 
-// NewIssues creates a new Issues instance with the default BasePath.
-func NewIssues(ctx context.Context, cfg *config.Config, ghClient *github.Client) Issues {
-	return Issues{
+// NewIssuesEndpoint creates a new IssuesEndpoint instance with the default BasePath.
+func NewIssuesEndpoint(ctx context.Context, cfg *config.Config,
+	ghClient *github.Client) IssuesEndpoint {
+	return IssuesEndpoint{
 		BasePath: IssuesPath,
 		ctx:      ctx,
 		cfg:      cfg,
@@ -41,12 +44,12 @@ func NewIssues(ctx context.Context, cfg *config.Config, ghClient *github.Client)
 }
 
 // Register implements Registerable.Register
-func (i Issues) Register(mux *http.ServeMux) {
-	mux.HandleFunc(i.BasePath, i.Get)
+func (i IssuesEndpoint) Register(router *mux.Router) {
+	router.HandleFunc(i.BasePath, i.Get).Methods("GET")
 }
 
 // Get retrieves all GitHub issues.
-func (i Issues) Get(w http.ResponseWriter, r *http.Request) {
+func (i IssuesEndpoint) Get(w http.ResponseWriter, r *http.Request) {
 	// Get repo
 	repo, err := gh.RetrieveRepo(i.ctx, i.cfg, i.ghClient)
 	if err != nil {
@@ -66,7 +69,9 @@ func (i Issues) Get(w http.ResponseWriter, r *http.Request) {
 	// Get issue dependencies
 	depIssues := []zenhub.DepIssue{}
 	for _, issue := range issues {
-		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, *repo.ID, *issue.Number)
+		deps, err := zenhub.RetrieveDeps(i.ctx, i.cfg, *repo.ID,
+			*issue.Number)
+
 		if err != nil {
 			WriteErr(w, 500, fmt.Errorf("error retrieving "+
 				"issue dependencies, issue #: %d, err: %s",

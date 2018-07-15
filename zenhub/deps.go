@@ -8,33 +8,19 @@ import (
 	"net/http"
 
 	"github.com/Noah-Huppert/gh-gantt/config"
-
-	"github.com/google/go-github/github"
 )
 
-// IssueDeps holds GitHub issue dependency information.
-type IssueDeps struct {
-	// BlockedBy holds the GitHub issue numbers which are blocking the
-	// issue
-	BlockedBy []int `json:"blocked_by"`
+// DepsCategoryKey indicates that an API request is referring to all issue
+// dependency models stored in the cache
+const DepsCategoryKey string = "zenhub.dependencies"
 
-	// Blocking holds the GitHub issue numbers which are being blocked
-	// by the issue
-	Blocking []int `json:"blocking"`
-}
+// DepKeysKey is the name of the Redis set which holds the DepCacheKey keys
+// which are present in the cache.
+const DepKeysKey string = "zenhub.dependencies.keys"
 
-// DepIssue is a github.Issue with fields for dependency information
-type DepIssue struct {
-	github.Issue
-	IssueDeps
-}
-
-// NewDepIssue creates a new DepIssue instance from a github.Issue and a IssueDeps
-func NewDepIssue(iss github.Issue, deps IssueDeps) DepIssue {
-	return DepIssue{
-		iss,
-		deps,
-	}
+// DepCacheKey returns the key to store cache items under
+func DepCacheKey(repoId int64, issueId int) string {
+	return fmt.Sprintf("zenhub.dependencies.%d.%d", repoId, issueId)
 }
 
 // DepsURL is the URL used to retrieve issue dependency information.
