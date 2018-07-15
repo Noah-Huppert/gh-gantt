@@ -5,10 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/Noah-Huppert/gh-gantt/cache"
 	"github.com/Noah-Huppert/gh-gantt/config"
 	"github.com/Noah-Huppert/gh-gantt/gh"
-	"github.com/Noah-Huppert/gh-gantt/redis"
 	"github.com/Noah-Huppert/gh-gantt/server"
 )
 
@@ -29,23 +27,10 @@ func main() {
 
 	ghClient := gh.NewClient(ctx, cfg)
 
-	// Redis clients
-	redisClient, err := redis.NewClient(cfg)
-	if err != nil {
-		logger.Fatalf("error creating Redis client: %s", err.Error())
-	}
-
-	redisCache, err := cache.NewClient(cfg)
-	if err != nil {
-		logger.Fatalf("error creating Redis cache client: %s", err.Error())
-	}
-
-	logger.Printf("connected to Redis host")
-
 	// Server
-	logger.Printf("starting server")
+	logger.Printf("starting server on :%d", cfg.HTTP.Port)
 
-	srv := server.NewServer(ctx, cfg, ghClient, redisClient, redisCache)
+	srv := server.NewServer(ctx, cfg, ghClient)
 
 	err = srv.Start()
 	if err != nil {

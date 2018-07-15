@@ -8,9 +8,6 @@ import (
 	"net/http"
 
 	"github.com/Noah-Huppert/gh-gantt/config"
-
-	"github.com/go-redis/cache"
-	"github.com/go-redis/redis"
 )
 
 // DepsCategoryKey indicates that an API request is referring to all issue
@@ -58,21 +55,8 @@ func extractIssueNumbers(data []map[string]interface{}) ([]int, error) {
 
 // RetrieveDeps returns an IssueDeps instance containing dependency information
 // for the specified issue. An error is returned if one occurs.
-func RetrieveDeps(ctx context.Context, cfg *config.Config,
-	redisClient *redis.Client, redisCache *cache.Codec, repoId int64,
+func RetrieveDeps(ctx context.Context, cfg *config.Config, repoId int64,
 	issueId int) (IssueDeps, error) {
-
-	// Check if dep exists
-	var deps IssueDeps
-	cacheKey := DepCacheKey(repoId, issueId)
-
-	if err := redisCache.Get(cacheKey, &deps); (err != nil) && (err != cache.ErrCacheMiss) {
-		return IssueDeps{}, fmt.Errorf("error retrieving all ZenHub dependency"+
-			" from cache: %s", err.Error())
-	} else if err != cache.ErrCacheMiss {
-		// Cached
-		return deps, nil
-	}
 
 	// Setup ZenHub API request
 	reqUrl := fmt.Sprintf(DepsURL, repoId, issueId)
@@ -129,23 +113,6 @@ func RetrieveDeps(ctx context.Context, cfg *config.Config,
 		}
 
 		deps.Blocking = blocking
-
-		// Save in cache
-		if err = redisCache.Set(&cache.Item{
-			Key:        cacheKey,
-			Object:     deps,
-			Expiration: 0,
-		}); err != nil {
-
-			return IssueDeps{}, fmt.Errorf("error saving results"+
-				" to cache: %s", err.Error())
-		}
-
-		if err = redisClient.SAdd(DepKeysKey, cacheKey).Err(); err != nil {
-			return IssueDeps{}, fmt.Errorf("error saving cache "+
-				"key to dependencies keys set, key: %s, err: %s",
-				cacheKey, err.Error())
-		}
 
 		return deps, nil
 	} else {
