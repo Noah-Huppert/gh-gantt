@@ -7,18 +7,10 @@ GitHub issues gantt chart generator.
 # Table Of Contents
 - [Overview](#overview)
 - [Setup](#setup)
-- [Undocumented ZenHub API Endpoints](#undocumented-zenhub-api-endpoints)
-	- [Dependences](#dependences)
 
 # Overview
-Creates a Gantt chart from GitHub repository issues. Uses ZenHub to 
-retrieve the dependency information necessary to create a Gantt chart.  
-
-The scheduling of tasks is determined by which Milestone they are in.  
-
-Current status: Heavy development, screenshot:  
-
-<img alt="Gantt chart generated with gh-gantt tool" width="400" src="/img/screenshot.png">
+GH Gantt displays GitHub issues in gantt chart form. ZenHub is used to augment 
+GitHub issues with additional information.
 
 # Setup
 ## Configuration File
