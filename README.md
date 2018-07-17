@@ -2,7 +2,9 @@
 GitHub issues gantt chart generator.  
 
 # Our Sponsors
-[![Enzyme Logo](img/enzyme_logo_blue.svg)](https://www.enzyme.com/)  
+<a href="https://www.enzyme.com" target="_blank">
+![Enzyme Logo](img/enzyme_logo_blue.svg)
+</a>
 
 # Table Of Contents
 - [Overview](#overview)
