@@ -1,12 +1,14 @@
 # GitHub Gantt
 GitHub issues gantt chart generator.  
 
-# Our Sponsors
-[![Enzyme Logo](img/enzyme_logo_blue.svg)](https://www.enzyme.com)
-
 # Table Of Contents
+- [Our Sponsors](#our-sponsors)
 - [Overview](#overview)
 - [Setup](#setup)
+
+# Our Sponsors
+[Enzyme](https://www.enzyme.com) sponsors the development of this product.  
+[![Enzyme Logo](img/enzyme_logo_blue.svg)](https://www.enzyme.com)
 
 # Overview
 GH Gantt displays GitHub issues in gantt chart form. ZenHub is used to augment 
