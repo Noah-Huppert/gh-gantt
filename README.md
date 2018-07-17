@@ -7,7 +7,8 @@ GitHub issues gantt chart generator.
 - [Setup](#setup)
 
 # Our Sponsors
-[Enzyme](https://www.enzyme.com) sponsors the development of this product.  
+[Enzyme](https://www.enzyme.com) sponsors the development of this project.  
+  
 [![Enzyme Logo](img/enzyme_logo_blue.svg)](https://www.enzyme.com)
 
 # Overview
