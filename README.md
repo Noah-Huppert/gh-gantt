@@ -15,7 +15,7 @@ GitHub issues gantt chart generator.
 GH Gantt displays GitHub issues in gantt chart form. ZenHub is used to augment 
 GitHub issues with additional information.  
 
-See the [wiki](wiki) for design information.
+See the [wiki](https://github.com/Noah-Huppert/gh-gantt/wiki) for design information.
 
 # Setup
 ## Configuration File
