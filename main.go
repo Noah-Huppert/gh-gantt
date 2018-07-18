@@ -7,9 +7,8 @@ import (
 	"os/signal"
 
 	"github.com/Noah-Huppert/gh-gantt/config"
-	"github.com/Noah-Huppert/gh-gantt/gh"
+	"github.com/Noah-Huppert/gh-gantt/http"
 	"github.com/Noah-Huppert/gh-gantt/rpc"
-	"github.com/Noah-Huppert/gh-gantt/server"
 )
 
 // logger used to output program information
@@ -39,7 +38,7 @@ func main() {
 	}
 
 	// GitHub setup
-	ghClient := gh.NewClient(ctx, cfg)
+	//ghClient := gh.NewClient(ctx, cfg)
 
 	// Status channel setup
 
@@ -58,9 +57,7 @@ func main() {
 	// HTTP Server
 	logger.Printf("starting http server on :%d\n", cfg.HTTP.Port)
 
-	srv := server.NewServer(ctx, cfg, ghClient)
-
-	srv.Start(statusOKChan, statusErrChan)
+	http.Start(ctx, statusOKChan, statusErrChan, cfg)
 
 	// Wait for servers to finish
 	shutdownOK := true
