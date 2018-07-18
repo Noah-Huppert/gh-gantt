@@ -41,13 +41,27 @@ own values.
 
 # Development
 ## Dependencies
-[Dep](https://golang.github.io/dep/) is used to manage Go dependencies.  
+### Server
+[Dep](https://golang.github.io/dep/) is used to manage server Go dependencies.  
 
 Install / update dependencies:
 
 ```
 dep ensure
 ```
+
+### Frontend
+Pub is used to manage frontend Dart dependencies.  
+
+Install / update dependencies:
+
+```
+cd frontend
+pub get
+```
+
+TODO: Design frontend dev tools for watching frontend src and rebuilding
+TODO: Get basic GRPC setup for frontend
 
 ## Protocol Buffers
 [Protocol Buffers](https://developers.google.com/protocol-buffers/) is used to 
