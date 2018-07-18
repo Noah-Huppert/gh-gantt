@@ -1,9 +1,8 @@
+# Configuration
+config.toml
+
+# Protocol Buffers
+*.pb.go
+
 # Go
 vendor/
-
-# Configuration
-config.*
-!config.ex.toml
-
-# Redis
-run-data/

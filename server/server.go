@@ -52,15 +52,49 @@ func (s Server) Routes() *mux.Router {
 	return router
 }
 
-func (s Server) Start() error {
+func (s Server) Start(statusOKChan chan<- string,
+	statusErrChan chan<- error) {
+
 	router := s.Routes()
 
+	// Setup graceful stop handler
 	portStr := fmt.Sprintf(":%d", s.cfg.HTTP.Port)
 
-	err := http.ListenAndServe(portStr, router)
-	if err != nil {
-		return fmt.Errorf("error starting server: %s", err.Error())
+	httpServer := &http.Server{
+		Addr:    portStr,
+		Handler: router,
 	}
 
-	return nil
+	// startFailedChan will receive a message if the http server failed to
+	// start. Content of message does not matter, any message received
+	// indicates a start failure.
+	//
+	// Used by the graceful exit go routine to exit when the server does
+	// not start.
+	startFailedChan := make(chan bool, 1)
+
+	go func() {
+		select {
+		case <-s.ctx.Done():
+			err := httpServer.Shutdown(nil)
+
+			if err != nil {
+				statusErrChan <- fmt.Errorf("error "+
+					"shutting down http server: %s",
+					err.Error())
+			} else {
+				statusOKChan <- "http server"
+			}
+		case <-startFailedChan:
+			return
+		}
+	}()
+
+	// Serve http content
+	err := httpServer.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		statusErrChan <- fmt.Errorf("error starting http server: %s",
+			err.Error())
+		startFailedChan <- true
+	}
 }

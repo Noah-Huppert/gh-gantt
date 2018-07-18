@@ -4,7 +4,8 @@ GitHub issues gantt chart generator.
 # Table Of Contents
 - [Our Sponsors](#our-sponsors)
 - [Overview](#overview)
-- [Setup](#setup)
+- [Configuration](#setup)
+- [Development](#development)
 
 # Our Sponsors
 [![Enzyme Logo](img/enzyme_logo_blue.svg)](https://www.enzyme.com)  
@@ -17,13 +18,14 @@ GitHub issues with additional information.
 
 See the [wiki](https://github.com/Noah-Huppert/gh-gantt/wiki) for design information.
 
-# Setup
-## Configuration File
+# Configuration
 Make a copy of `config.ex.toml` named `config.toml` and fill it in with your 
 own values.  
 
 - HTTP: Web server configuration
 	- Port: Port to handle HTTP traffic from
+- RPC: Remote procedure call configuration
+	- Port: Port to list for RPC calls on
 - GitHub: Configuration related to GitHub issues API
 	- AccessToken: GitHub API access token used to retrieve repo issues
 	- RepoOwner: Login of GitHub user who owns repository
@@ -36,3 +38,30 @@ own values.
 		  ```js
 		  window.localStorage.getItem("api_token")
 		  ```
+
+# Development
+## Dependencies
+[Dep](https://golang.github.io/dep/) is used to manage Go dependencies.  
+
+Install / update dependencies:
+
+```
+dep ensure
+```
+
+## Protocol Buffers
+[Protocol Buffers](https://developers.google.com/protocol-buffers/) is used to 
+generate RPC code.  
+
+Generate code from protocol buffers:
+
+```
+make proto
+```
+
+## Start Server
+Start the server:
+
+```
+make run
+```
