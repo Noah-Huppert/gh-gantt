@@ -9,6 +9,7 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/config"
 	"github.com/Noah-Huppert/gh-gantt/http"
 	"github.com/Noah-Huppert/gh-gantt/rpc"
+	"github.com/Noah-Huppert/gh-gantt/status"
 )
 
 // logger used to output program information
@@ -42,34 +43,30 @@ func main() {
 
 	// Status channel setup
 
-	// statusOKChan receives the names of servers which have exited
-	// successfully
-	statusOKChan := make(chan string, 2)
-
-	// statusErrChan receives errors from the rpc or http servers
-	statusErrChan := make(chan error, 2)
+	// statusChan receives system component status messages
+	statusChan := make(chan status.StatusMsg, 2)
 
 	// GRPC Server
 	logger.Printf("starting grpc server on :%d\n", cfg.RPC.Port)
 
-	rpc.Start(ctx, statusOKChan, statusErrChan, cfg)
+	rpc.Start(ctx, statusChan, cfg)
 
 	// HTTP Server
 	logger.Printf("starting http server on :%d\n", cfg.HTTP.Port)
 
-	http.Start(ctx, statusOKChan, statusErrChan, cfg)
+	http.Start(ctx, statusChan, cfg)
 
 	// Wait for servers to finish
 	shutdownOK := true
 	for i := 0; i < 2; i++ {
-		select {
-		case system := <-statusOKChan:
-			logger.Printf("%s successfully shutdown\n",
-				system)
+		msg := <-statusChan
 
-		case err = <-statusErrChan:
-			logger.Println(err.Error())
+		if msg.Err != nil {
+			logger.Printf("error in %s: %s\n", msg.System,
+				err.Error())
 			shutdownOK = false
+		} else {
+			logger.Printf("%s successfully shutdown\n", msg.System)
 		}
 	}
 

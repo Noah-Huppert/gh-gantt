@@ -7,21 +7,29 @@ import (
 
 	"github.com/Noah-Huppert/gh-gantt/config"
 	"github.com/Noah-Huppert/gh-gantt/repos"
+	"github.com/Noah-Huppert/gh-gantt/status"
 
 	"google.golang.org/grpc"
 )
 
+// systemName is the name used to identify the rpc server to other pieces of
+// the application
+const systemName string = "rpc server"
+
 // Start the GRPC server.
-func Start(ctx context.Context, statusOKChan chan<- string,
-	statusErrChan chan<- error, cfg *config.Config) {
+func Start(ctx context.Context, statusChan chan<- status.StatusMsg,
+	cfg *config.Config) {
 
 	// Listen on rpc port
 	grpcHostStr := fmt.Sprintf(":%d", cfg.RPC.Port)
 
 	grpcListener, err := net.Listen("tcp", grpcHostStr)
 	if err != nil {
-		statusErrChan <- fmt.Errorf("error listening on grpc "+
-			"port: %s\n", err.Error())
+		statusChan <- status.StatusMsg{
+			System: systemName,
+			Err: fmt.Errorf("error listening on grpc port: %s\n",
+				err.Error()),
+		}
 		return
 	}
 
@@ -45,7 +53,9 @@ func Start(ctx context.Context, statusOKChan chan<- string,
 		select {
 		case <-ctx.Done():
 			grpcServer.GracefulStop()
-			statusOKChan <- "rpc server"
+			statusChan <- status.StatusMsg{
+				System: systemName,
+			}
 		case <-startFailedChan:
 			return
 		}
@@ -55,8 +65,11 @@ func Start(ctx context.Context, statusOKChan chan<- string,
 	go func() {
 		err = grpcServer.Serve(grpcListener)
 		if err != nil {
-			statusErrChan <- fmt.Errorf("error serving rpc "+
-				"requests: %s", err.Error())
+			statusChan <- status.StatusMsg{
+				System: systemName,
+				Err: fmt.Errorf("error serving rpc "+
+					"requests: %s", err.Error()),
+			}
 			startFailedChan <- true
 		}
 	}()

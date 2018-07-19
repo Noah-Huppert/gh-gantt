@@ -6,14 +6,19 @@ import (
 	"net/http"
 
 	"github.com/Noah-Huppert/gh-gantt/config"
+	"github.com/Noah-Huppert/gh-gantt/status"
 )
 
 // StaticDir is the directory to serve static files from
 const staticDir string = "./static"
 
+// systemName is the name used to identify the http server to other pieces of
+// the application
+const systemName string = "http server"
+
 // Start serving http content
-func Start(ctx context.Context, statusOKChan chan<- string,
-	statusErrChan chan<- error, cfg *config.Config) {
+func Start(ctx context.Context, statusChan chan<- status.StatusMsg,
+	cfg *config.Config) {
 
 	// Setup graceful stop handler
 	portStr := fmt.Sprintf(":%d", cfg.HTTP.Port)
@@ -37,11 +42,16 @@ func Start(ctx context.Context, statusOKChan chan<- string,
 			err := httpServer.Shutdown(nil)
 
 			if err != nil {
-				statusErrChan <- fmt.Errorf("error "+
-					"shutting down http server: %s",
-					err.Error())
+				statusChan <- status.StatusMsg{
+					System: systemName,
+					Err: fmt.Errorf("error shutting "+
+						"down http server: %s",
+						err.Error()),
+				}
 			} else {
-				statusOKChan <- "http server"
+				statusChan <- status.StatusMsg{
+					System: systemName,
+				}
 			}
 		case <-startFailedChan:
 			return
@@ -51,8 +61,11 @@ func Start(ctx context.Context, statusOKChan chan<- string,
 	// Serve http content
 	err := httpServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
-		statusErrChan <- fmt.Errorf("error starting http server: %s",
-			err.Error())
+		statusChan <- status.StatusMsg{
+			System: systemName,
+			Err: fmt.Errorf("error starting http server: %s",
+				err.Error()),
+		}
 		startFailedChan <- true
 	}
 }
