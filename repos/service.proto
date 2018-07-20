@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package repos;
+
+import "repos/repo.proto";
+
+service Repositories {
+  rpc List(ListReq) returns (ListResp) {}
+}
+
+message ListReq {}
+
+message ListResp {
+  repeated Repository repositories = 1;
+}

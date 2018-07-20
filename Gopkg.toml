@@ -22,13 +22,29 @@
 
 
 [[constraint]]
+  name = "github.com/golang/protobuf"
+  version = "1.1.0"
+
+[[constraint]]
   name = "github.com/google/go-github"
   version = "15.0.0"
 
 [[constraint]]
+  name = "github.com/gorilla/mux"
+  version = "1.6.2"
+
+[[constraint]]
   name = "github.com/spf13/viper"
-  version = "1.0.0"
+  version = "1.0.2"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/net"
 
 [[constraint]]
   branch = "master"
   name = "golang.org/x/oauth2"
+
+[[constraint]]
+  name = "google.golang.org/grpc"
+  version = "1.13.0"
