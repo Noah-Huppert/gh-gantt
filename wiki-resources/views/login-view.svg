@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.2 2405546, 2018-03-11"
+   sodipodi:docname="login-view.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="386.13789"
+     inkscape:cy="331.80225"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1048"
+     inkscape:window-x="0"
+     inkscape:window-y="32"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="GH Gantt Label"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-87)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="91.413383"
+       y="146.71652"
+       id="text817"><tspan
+         sodipodi:role="line"
+         id="tspan815"
+         x="91.413383"
+         y="146.71652"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19.75555611px;font-family:Roboto;-inkscape-font-specification:'Roboto, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">GitHub Gantt</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="GitHub Logo">
+    <path
+       d="m 131.83871,128.49962 c -3.17288,0 -5.74604,2.57281 -5.74604,5.74675 0,2.53859 1.64641,4.69265 3.92994,5.45289 0.28752,0.0526 0.39229,-0.12489 0.39229,-0.27729 0,-0.13652 -0.005,-0.49777 -0.008,-0.97719 -1.59844,0.34713 -1.93569,-0.77047 -1.93569,-0.77047 -0.26141,-0.66393 -0.63818,-0.84067 -0.63818,-0.84067 -0.52175,-0.3563 0.0395,-0.34925 0.0395,-0.34925 0.57679,0.0406 0.88018,0.59232 0.88018,0.59232 0.51258,0.87806 1.34514,0.62441 1.67252,0.4773 0.0522,-0.37112 0.20073,-0.62441 0.36477,-0.76799 -1.276,-0.14535 -2.61761,-0.63818 -2.61761,-2.84022 0,-0.62759 0.22401,-1.14017 0.5916,-1.54199 -0.0593,-0.14534 -0.25646,-0.72954 0.0565,-1.52082 0,0 0.48225,-0.15452 1.58009,0.58878 0.45826,-0.12735 0.95003,-0.19085 1.43863,-0.19332 0.48824,0.002 0.97966,0.066 1.43863,0.19332 1.09714,-0.7433 1.57868,-0.58878 1.57868,-0.58878 0.31362,0.79128 0.11641,1.37548 0.0575,1.52082 0.3683,0.40182 0.59055,0.9144 0.59055,1.54199 0,2.20769 -1.34373,2.69346 -2.62361,2.83563 0.20602,0.17745 0.38982,0.52811 0.38982,1.06433 0,0.768 -0.007,1.38783 -0.007,1.57621 0,0.15381 0.10372,0.33267 0.39511,0.27658 2.28177,-0.76165 3.92677,-2.91394 3.92677,-5.45218 0,-3.17394 -2.57316,-5.74675 -5.7471,-5.74675"
+       style="fill:#1b1817;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.03527778"
+       id="path4667"
+       inkscape:connector-curvature="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer5"
+     inkscape:label="Login Button Text">
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5415"
+       style="fill:black;fill-opacity:1;stroke:none;font-family:sans-serif;font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;letter-spacing:0px;word-spacing:0px"><flowRegion
+         id="flowRegion5417"><rect
+           id="rect5419"
+           width="223.82407"
+           height="88.317284"
+           x="490.35379"
+           y="413.44943" /></flowRegion><flowPara
+         id="flowPara5421"></flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="142.85582"
+       y="137.02377"
+       id="text5425"><tspan
+         sodipodi:role="line"
+         id="tspan5423"
+         x="142.85582"
+         y="137.02377"
+         style="stroke-width:0.26458332">Login</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Login Button Box">
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2308878;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.96048632"
+       id="rect5412"
+       width="54.275444"
+       height="18.742979"
+       x="121.36228"
+       y="124.73265" />
+  </g>
+</svg>
