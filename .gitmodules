@@ -1,4 +1,0 @@
-[submodule "gh-gantt.wiki"]
-	path = gh-gantt.wiki
-	url = git@github.com:Noah-Huppert/gh-gantt.wiki.git
-	branch = master
