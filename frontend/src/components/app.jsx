@@ -1,9 +1,10 @@
-import React, { Component } from "react";
+import React from "react"
+import PropTypes from 'prop-types'
 
-export default class App extends Component {
-	render() {
-		return (
-			<h1>Hello React</h1>
-		);
-	}
-}
+import HelloContainer from './helloContainer'
+
+const App = () => (
+	<HelloContainer />
+)
+
+export default App
