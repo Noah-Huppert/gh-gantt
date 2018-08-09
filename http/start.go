@@ -9,8 +9,8 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/status"
 )
 
-// StaticDir is the directory to serve static files from
-const staticDir string = "./static"
+// staticDir is the directory to serve static files from
+const staticDir string = "./frontend/dist"
 
 // systemName is the name used to identify the http server to other pieces of
 // the application
