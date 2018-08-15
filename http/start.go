@@ -39,7 +39,7 @@ func Start(ctx context.Context, statusChan chan<- status.StatusMsg,
 	go func() {
 		select {
 		case <-ctx.Done():
-			err := httpServer.Shutdown(nil)
+			err := httpServer.Shutdown(ctx)
 
 			if err != nil {
 				statusChan <- status.StatusMsg{
