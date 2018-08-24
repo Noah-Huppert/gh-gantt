@@ -2,4 +2,4 @@
 
 # run server
 run:
-	go run main.go
+	revel run github.com/Noah-Huppert/gh-gantt/server
