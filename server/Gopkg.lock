@@ -9,6 +9,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/ekyoung/gin-nice-recovery"
+  packages = ["."]
+  revision = "1654dca486db940bf0c76b0562328f40a898504e"
+
+[[projects]]
+  branch = "master"
   name = "github.com/fvbock/endless"
   packages = ["."]
   revision = "447134032cb6a86814f570257390a379982dfc61"
@@ -30,6 +36,12 @@
   packages = [".","binding","json","render"]
   revision = "b869fe1415e4b9eb52f247441830d502aece2d4d"
   version = "v1.3.0"
+
+[[projects]]
+  name = "github.com/go-errors/errors"
+  packages = ["."]
+  revision = "a6af135bd4e28680facf08a3d206b454abc877a4"
+  version = "v1.0.1"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -94,6 +106,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "448916508607fcc6b0ebc541e2a19a66eb4561dff33215bfc2dd9129e5ca9f5b"
+  inputs-digest = "ccf46b1da89c80c684a1e2f0dbf3380b14d4a39432fada2d1fa7fc3e378efa17"
   solver-name = "gps-cdcl"
   solver-version = 1

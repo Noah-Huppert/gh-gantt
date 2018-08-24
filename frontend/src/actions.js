@@ -1,8 +1,8 @@
-import { HELLO } from "./actionTypes";
+import { OAUTH_CALLBACK } from "./actionTypes";
 
-export const hello = text => {
+export const oauthCallback = tempOAuthCode => {
 	return {
-		type: HELLO,
-		hello: text
+		type: OAUTH_CALLBACK,
+		tempOAuthCode: tempOAuthCode
 	}
 }

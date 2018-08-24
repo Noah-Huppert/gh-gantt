@@ -1,1 +1,1 @@
-export const HELLO = "HELLO"
+export const OAUTH_CALLBACK = "OAUTH_CALLBACK"
