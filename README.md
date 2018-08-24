@@ -19,25 +19,8 @@ GitHub issues with additional information.
 See the [wiki](https://github.com/Noah-Huppert/gh-gantt/wiki) for design information.
 
 # Configuration
-Make a copy of `config.ex.toml` named `config.toml` and fill it in with your 
-own values.  
-
-- HTTP: Web server configuration
-	- Port: Port to handle HTTP traffic from
-- RPC: Remote procedure call configuration
-	- Port: Port to list for RPC calls on
-- GitHub: Configuration related to GitHub issues API
-	- AccessToken: GitHub API access token used to retrieve repo issues
-	- RepoOwner: Login of GitHub user who owns repository
-	- RepoName: Name of GitHub repository to retrieve issues from
-- ZenHub:
-	- APIToken: ZenHub API access token  
-	            Must retrieve special ZenHub authentication token by:  
-		- [Navigating to app.zenhub.com](https://app.zenhub.com)  
-		- Run in the console  
-		  ```js
-		  window.localStorage.getItem("api_token")
-		  ```
+Configuration parameters are passed via environment variables. See the 
+`server/config/config.go` file for more information.
 
 # Development
 ## Dependencies
@@ -47,35 +30,44 @@ own values.
 Install / update dependencies:
 
 ```
+cd server
 dep ensure
 ```
 
 ### Frontend
-Pub is used to manage frontend Dart dependencies.  
+NPM is used to manage frontend NodeJS dependencies.  
 
 Install / update dependencies:
 
 ```
 cd frontend
-pub get
+npm install
 ```
 
-TODO: Design frontend dev tools for watching frontend src and rebuilding
-TODO: Get basic GRPC setup for frontend
-
-## Protocol Buffers
-[Protocol Buffers](https://developers.google.com/protocol-buffers/) is used to 
-generate RPC code.  
-
-Generate code from protocol buffers:
-
-```
-make proto
-```
-
-## Start Server
+## Start
+### Server
 Start the server:
 
 ```
+cd server
 make run
 ```
+
+### Frontend Build
+Build the frontend web app:
+
+```
+cd frontend
+npm run build
+```
+
+Rebuild the frontend web app on changes by running:
+
+```
+cd frontend
+make watch
+```
+
+This requires the 
+[onchanges script](https://github.com/Noah-Huppert/scripts/blob/master/onchanges) 
+to be in your path.
