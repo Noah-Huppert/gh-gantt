@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package repos;
-
-message Repository {
-  string github_id = 1;
-  string name = 2;
-  string description = 3;
-}
