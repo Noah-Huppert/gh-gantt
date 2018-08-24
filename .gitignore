@@ -1,8 +1,5 @@
-# Configuration
-config.toml
+# Server deps
+server/vendor/
 
-# Protocol Buffers
-*.pb.go
-
-# Go
-vendor/
+# Frontend deps
+frontend/node_modules/

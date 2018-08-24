@@ -1,78 +1,36 @@
 package main
 
 import (
-	"context"
-	"log"
-	"os"
-	"os/signal"
+	"fmt"
+	"net/http"
 
-	"github.com/Noah-Huppert/gh-gantt/config"
-	"github.com/Noah-Huppert/gh-gantt/http"
-	"github.com/Noah-Huppert/gh-gantt/rpc"
-	"github.com/Noah-Huppert/gh-gantt/status"
+	"github.com/Noah-Huppert/gh-gantt/server/api"
+	"github.com/Noah-Huppert/gh-gantt/server/config"
+
+	"github.com/Noah-Huppert/golog"
+	"github.com/fvbock/endless"
+	"github.com/gin-gonic/contrib/static"
+	"github.com/gin-gonic/gin"
 )
 
-// logger used to output program information
-var logger *log.Logger = log.New(os.Stdout, "main: ", 0)
-
 func main() {
-	ctx, ctxCancel := context.WithCancel(context.Background())
+	logger := golog.NewStdLogger("gh-gantt")
 
-	// Setup sigterm handler
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-	go func() {
-		select {
-		case <-sigChan:
-			logger.Println("caught interrupt, attempting to " +
-				"shutdown gracefully")
-			ctxCancel()
-		}
-	}()
-
-	// Configuration
-	logger.Println("loading configuration")
-
-	cfg, err := config.Load()
+	// Load configuration
+	cfg, err := config.NewConfig()
 	if err != nil {
-		logger.Fatalf("error loading configuration: %s\n", err.Error())
+		logger.Fatalf("error loading configuration: %s", err.Error())
 	}
 
-	// GitHub setup
-	//ghClient := gh.NewClient(ctx, cfg)
+	// Setup routes
+	router := gin.Default()
+	v0API := router.Group("/api/v0")
 
-	// Status channel setup
+	router.Use(static.Serve("/", static.LocalFile("../frontend/dist", true)))
+	v0API.GET("/healthz", api.HealthCheckHandler)
 
-	// statusChan receives system component status messages
-	statusChan := make(chan status.StatusMsg, 2)
-
-	// GRPC Server
-	logger.Printf("starting grpc server on :%d\n", cfg.RPC.Port)
-
-	rpc.Start(ctx, statusChan, cfg)
-
-	// HTTP Server
-	logger.Printf("starting http server on :%d\n", cfg.HTTP.Port)
-
-	http.Start(ctx, statusChan, cfg)
-
-	// Wait for servers to finish
-	shutdownOK := true
-	for i := 0; i < 2; i++ {
-		msg := <-statusChan
-
-		if msg.Err != nil {
-			logger.Printf("error in %s: %s\n", msg.System,
-				err.Error())
-			shutdownOK = false
-		} else {
-			logger.Printf("%s successfully shutdown\n", msg.System)
-		}
-	}
-
-	if shutdownOK {
-		logger.Println("successfully shutdown")
-	} else {
-		logger.Fatalf("failed to shutdown")
+	err = endless.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), router)
+	if err != nil && err != http.ErrServerClosed {
+		logger.Fatalf("error running HTTP server: %s", err.Error())
 	}
 }
