@@ -1,5 +1,8 @@
 # Server deps
 server/vendor/
 
+# Server config
+.env
+
 # Frontend deps
 frontend/node_modules/

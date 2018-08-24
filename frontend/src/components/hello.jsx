@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 const Hello = ({ onClick, hello }) => (
 	<h1 onClick={onClick}>
+		i
 		Hello {hello}
 	</h1>
 )
