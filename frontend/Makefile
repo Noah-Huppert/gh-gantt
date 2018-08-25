@@ -1,5 +1,9 @@
-.PHONY: watch
+.PHONY: build watch
+
+# build webpack
+build:
+	npm run build
 
 # watch for file changes and rebuild webpack
 watch:
-	onchanges ./src 'npm run build'
+	npm run watch

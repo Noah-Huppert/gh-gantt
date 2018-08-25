@@ -1,20 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"context"
+	"os"
+	"os/signal"
 
-	"github.com/Noah-Huppert/gh-gantt/server/api"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/http"
 
 	"github.com/Noah-Huppert/golog"
-	"github.com/ekyoung/gin-nice-recovery"
-	"github.com/fvbock/endless"
-	"github.com/gin-gonic/contrib/static"
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	// Setup context
+	ctx, ctxCancel := context.WithCancel(context.Background())
+
+	// Setup logger
 	logger := golog.NewStdLogger("gh-gantt")
 
 	// Load configuration
@@ -23,21 +24,22 @@ func main() {
 		logger.Fatalf("error loading configuration: %s", err.Error())
 	}
 
-	// Setup routes
-	router := gin.Default()
+	// Cancel context on interrupt signal
+	interruptChan := make(chan os.Signal, 1)
+	signal.Notify(interruptChan, os.Interrupt)
 
-	router.Use(nice.Recovery(api.RecoveryHandler))
+	go func() {
+		<-interruptChan
+		ctxCancel()
+	}()
 
-	v0API := router.Group("/api/v0")
+	// Start HTTP server
+	server := http.NewServer(ctx, *cfg, logger)
 
-	router.Use(static.Serve("/", static.LocalFile("../frontend/dist", true)))
-
-	v0API.GET("/healthz", api.HealthCheckHandler)
-	v0API.GET("/auth/login", api.MakeAuthLoginHandler(cfg.GithubClientID))
-	v0API.POST("/auth/callback", api.MakeAuthCallbackHandler(cfg.GithubClientID, cfg.GithubClientSecret))
-
-	err = endless.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), router)
-	if err != nil && err != http.ErrServerClosed {
+	err = server.Serve()
+	if err != nil {
 		logger.Fatalf("error running HTTP server: %s", err.Error())
 	}
+
+	logger.Info("done")
 }
