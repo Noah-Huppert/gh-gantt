@@ -1,5 +1,0 @@
-# Node modules
-node_modules/
-
-# Webpack build
-dist/

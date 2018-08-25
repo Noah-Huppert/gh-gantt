@@ -16,5 +16,4 @@ GitHub issues with additional information.
 
 See the [wiki](https://github.com/Noah-Huppert/gh-gantt/wiki) for design information.
 
-[Frontend readme](frontend/README.md)  
 [Server readme](server/README.md)

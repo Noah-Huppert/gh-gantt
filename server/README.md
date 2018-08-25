@@ -22,15 +22,24 @@ Install Go dependencies with [Dep](https://golang.github.io/dep/):
 dep ensure
 ```
 
+Install the Buffalo command line tool:
+
+```
+go get github.com/gobuffalo/buffalo/buffalo
+```
+
+
 # Run
-Install the Revel command line tool:
+Start a local database:
 
 ```
-go get github.com/revel/cmd/revel
+make db
 ```
 
-Run the server with the Revel command line tool:
+Start the server with the Buffalo command line tool:
 
 ```
-make run
+make dev
 ```
+
+The server will automatically restart when any changes to the source code are made.
