@@ -23,13 +23,7 @@ dep ensure
 ```
 
 # Run
-Install the Revel command line tool:
-
-```
-go get github.com/revel/cmd/revel
-```
-
-Run the server with the Revel command line tool:
+Start the server:
 
 ```
 make run
