@@ -1,14 +1,3 @@
-vendor/
-**/*.log
-**/*.sqlite
-.idea/
-bin/
+test-results/
 tmp/
-node_modules/
-.sass-cache/
-*-packr.go
-public/assets/
-server
-.vscode/
-.grifter/
-.env
+routes/
