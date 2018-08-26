@@ -9,6 +9,7 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/server/config"
 
 	"github.com/Noah-Huppert/golog"
+	"github.com/gorilla/mux"
 )
 
 // Server responds to HTTP requests
@@ -35,17 +36,20 @@ func NewServer(ctx context.Context, cfg config.Config, logger golog.Logger) Serv
 // Serve brings up an HTTP server to serve requests
 func (s Server) Serve() error {
 	// Load routes
-	mux := http.NewServeMux()
+	router := mux.NewRouter()
 
-	NestedHandle(mux, "/api", api.NewAPIHandler())
-	mux.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
+	api.SetupRouter(router.PathPrefix("/api/v0").Subrouter())
+	router.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
+
+	// Setup recovery handler
+	recoveryHandler := NewRecoveryHandler(router, s.logger)
 
 	// Create HTTP server
 	httpAddr := fmt.Sprintf(":%d", s.cfg.Port)
 
 	httpServer := http.Server{
 		Addr:    httpAddr,
-		Handler: mux,
+		Handler: recoveryHandler,
 	}
 
 	// Stop server when context is canceled
