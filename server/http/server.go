@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Noah-Huppert/gh-gantt/server/api"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
 
 	"github.com/Noah-Huppert/golog"
@@ -36,6 +37,7 @@ func (s Server) Serve() error {
 	// Load routes
 	mux := http.NewServeMux()
 
+	NestedMux(mux, "/api", api.NewAPIHandler())
 	mux.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
 
 	// Create HTTP server
