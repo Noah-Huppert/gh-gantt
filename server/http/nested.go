@@ -4,8 +4,12 @@ import (
 	"net/http"
 )
 
-// NestedMux registers a child http.ServeMux under a sub path in a parent http.ServeMux
-func NestedMux(parent *http.ServeMux, path string, child *http.ServeMux) {
+// NestedHandle registers an http.Handler under a sub path in an http.ServeMux.
+// This allows a handler to be created without the knowledge of what sub path it will be registered under.
+//
+// Ex: Handler responds to /foo route. With this method it could be registered under /api/foo with no changes to the
+// handlers code.
+func NestedHandle(parent *http.ServeMux, path string, child http.Handler) {
 	// Make versions of path with and without trailing slash
 	lenPath := len(path)
 

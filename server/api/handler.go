@@ -6,7 +6,7 @@ import (
 )
 
 // NewAPIHandler creates a new http.Handler to serve API requests
-func NewAPIHandler() *http.ServeMux {
+func NewAPIHandler() http.Handler {
 	// Create mux
 	mux := http.NewServeMux()
 

@@ -37,7 +37,7 @@ func (s Server) Serve() error {
 	// Load routes
 	mux := http.NewServeMux()
 
-	NestedMux(mux, "/api", api.NewAPIHandler())
+	NestedHandle(mux, "/api", api.NewAPIHandler())
 	mux.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
 
 	// Create HTTP server
