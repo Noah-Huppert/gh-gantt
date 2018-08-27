@@ -18,18 +18,18 @@ type RedirectResponder struct {
 func NewRedirectResponder(location string, permanent bool) RedirectResponder {
 	return RedirectResponder{
 		Location:  location,
-		permanent: permanent,
+		Permanent: permanent,
 	}
 }
 
 // Respond implements Responder.Respond
-func (r RedirectResponder) Respond(w http.ResponseWriter, r *http.Request) {
+func (r RedirectResponder) Respond(w http.ResponseWriter, req *http.Request) {
 	// Write status
+	status := http.StatusTemporaryRedirect
+
 	if r.Permanent {
-		w.WriteHeader(http.StatusPermanentRedirect)
-	} else {
-		w.WriteHeader(http.StatusTemporaryRedirect)
+		status = http.StatusPermanentRedirect
 	}
 
-	http.Redirect(w, r, r.Location)
+	http.Redirect(w, req, r.Location, status)
 }
