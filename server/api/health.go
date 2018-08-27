@@ -9,9 +9,9 @@ import (
 // HealthCheckHandler implements http.ResponderHandler for the health check endpoint
 type HealthCheckHandler struct{}
 
-// NewHealthCheckHandler creates a new HealthCheckHandler and wraps it to become an http.Handler
-func NewHealthCheckHandler() http.Handler {
-	return resp.WrapResponderHandler(HealthCheckHandler{})
+// NewHealthCheckHandler creates a new HealthCheckHandler
+func NewHealthCheckHandler() HealthCheckHandler {
+	return HealthCheckHandler{}
 }
 
 // Handle implements resp.ResponderHandler.Handle
