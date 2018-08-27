@@ -1,4 +1,4 @@
-package http
+package serve
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ func NewRecoveryHandler(rootHandler http.Handler, logger golog.Logger) RecoveryH
 }
 
 // ServeHTTP implements http.Handler.ServeHTTP
-func (r RecoveryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (r RecoveryHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// Setup recovery
 	defer func() {
 		err := recover()
@@ -35,12 +35,14 @@ func (r RecoveryHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		r.logger.Errorf("%s %s panicked: %s", err.Error())
+		r.logger.Errorf("%s %s panicked: %s", req.Method, req.URL.String(), err)
 		debug.PrintStack()
 
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
+
 		fmt.Fprint(w, "{\"error\": \"an internal server error occurred\"}")
 	}()
 
-	r.rootHandler(w, r)
+	r.rootHandler.ServeHTTP(w, req)
 }

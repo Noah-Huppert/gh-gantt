@@ -1,7 +1,6 @@
-package http
+package resp
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -23,7 +22,7 @@ func NewErrorResponder(err error, status int) ErrorResponder {
 }
 
 // Respond implements Responder.Respond
-func (e ErrorResponder) Respond(w http.ResponseWriter, r http.Request) {
+func (e ErrorResponder) Respond(w http.ResponseWriter, r *http.Request) {
 	resp := map[string]string{
 		"error": e.Error.Error(),
 	}

@@ -1,4 +1,4 @@
-package http
+package resp
 
 import (
 	"net/http"
@@ -19,8 +19,8 @@ type ResponderHandlerWrapper struct {
 }
 
 // ServeHTTP implements http.Handler.ServeHTTP
-func (w ResponderHandlerWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	responder := w.responderHandler.Handle(r)
+func (wrapper ResponderHandlerWrapper) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	responder := wrapper.responderHandler.Handle(r)
 
 	responder.Respond(w, r)
 }

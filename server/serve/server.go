@@ -1,4 +1,4 @@
-package http
+package serve
 
 import (
 	"context"
@@ -42,7 +42,7 @@ func (s Server) Serve() error {
 	router.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
 
 	// Setup recovery handler
-	recoveryHandler := NewRecoveryHandler(router, s.logger)
+	recoveryHandler := NewRecoveryHandler(router, s.logger.GetChild("recovery"))
 
 	// Create HTTP server
 	httpAddr := fmt.Sprintf(":%d", s.cfg.Port)
