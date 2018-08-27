@@ -6,7 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/Noah-Huppert/gh-gantt/server/config"
-	"github.com/Noah-Huppert/gh-gantt/server/http"
+	"github.com/Noah-Huppert/gh-gantt/server/serve"
 
 	"github.com/Noah-Huppert/golog"
 )
@@ -34,7 +34,7 @@ func main() {
 	}()
 
 	// Start HTTP server
-	server := http.NewServer(ctx, *cfg, logger)
+	server := serve.NewServer(ctx, *cfg, logger)
 
 	err = server.Serve()
 	if err != nil {
