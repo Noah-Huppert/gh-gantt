@@ -38,7 +38,11 @@ func (s Server) Serve() error {
 	// Load routes
 	router := mux.NewRouter()
 
-	api.SetupRouter(router.PathPrefix("/api/v0").Subrouter())
+	apiRouter := router.PathPrefix("/api/v0").Subrouter()
+
+	apiHandlers := api.NewAPIHandlers(s.logger, s.cfg)
+	apiHandlers.SetupRouter(apiRouter)
+
 	router.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
 
 	// Setup recovery handler
