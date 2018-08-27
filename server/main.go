@@ -1,38 +1,45 @@
 package main
 
 import (
-	"log"
+	"context"
+	"os"
+	"os/signal"
 
-	"github.com/Noah-Huppert/gh-gantt/server/actions"
+	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/serve"
+
+	"github.com/Noah-Huppert/golog"
 )
 
-// main is the starting point to your Buffalo application.
-// you can feel free and add to this `main` method, change
-// what it does, etc...
-// All we ask is that, at some point, you make sure to
-// call `app.Serve()`, unless you don't want to start your
-// application that is. :)
 func main() {
-	app := actions.App()
-	if err := app.Serve(); err != nil {
-		log.Fatal(err)
+	// Setup context
+	ctx, ctxCancel := context.WithCancel(context.Background())
+
+	// Setup logger
+	logger := golog.NewStdLogger("gh-gantt")
+
+	// Load configuration
+	cfg, err := config.NewConfig()
+	if err != nil {
+		logger.Fatalf("error loading configuration: %s", err.Error())
 	}
+
+	// Cancel context on interrupt signal
+	interruptChan := make(chan os.Signal, 1)
+	signal.Notify(interruptChan, os.Interrupt)
+
+	go func() {
+		<-interruptChan
+		ctxCancel()
+	}()
+
+	// Start HTTP server
+	server := serve.NewServer(ctx, *cfg, logger)
+
+	err = server.Serve()
+	if err != nil {
+		logger.Fatalf("error running HTTP server: %s", err.Error())
+	}
+
+	logger.Info("done")
 }
-
-/*
-# Notes about `main.go`
-
-## SSL Support
-
-We recommend placing your application behind a proxy, such as
-Apache or Nginx and letting them do the SSL heaving lifting
-for you. https://gobuffalo.io/en/docs/proxy
-
-## Buffalo Build
-
-When `buffalo build` is run to compile your binary this `main`
-function will be at the heart of that binary. It is expected
-that your `main` function will start your application using
-the `app.Serve()` method.
-
-*/
