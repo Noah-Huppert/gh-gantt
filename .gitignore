@@ -1,8 +1,19 @@
-# Server deps
+##########
+# Server #
+##########
+
+# Dependencies
 server/vendor/
 
-# Server config
+# Config
 .env
 
-# Frontend deps
+# Local database
+server/run-data/
+
+############
+# Frontend #
+############
+
+# Dependencies
 frontend/node_modules/
