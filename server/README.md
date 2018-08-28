@@ -23,6 +23,12 @@ dep ensure
 ```
 
 # Run
+Start the local Postgres database:
+
+```
+make db
+```
+
 Start the server:
 
 ```
