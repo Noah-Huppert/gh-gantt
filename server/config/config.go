@@ -20,6 +20,9 @@ type Config struct {
 	// DBHost is the host of the database
 	DBHost string `required:"true" envconfig:"db_host"`
 
+	// DBPort is the port the database accepts connections on, defaults to 5432
+	DBPort int `default:"5432" envconfig:"db_port"`
+
 	// DBName is the name of the database to save data in
 	DBName string `required:"true" envconfig:"db_name"`
 

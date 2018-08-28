@@ -7,6 +7,7 @@ import (
 
 	"github.com/Noah-Huppert/golog"
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 )
 
 // APIHandlers sets up the handlers for API endpoints
@@ -16,13 +17,17 @@ type APIHandlers struct {
 
 	// cfg is the application configuration
 	cfg config.Config
+
+	// db is a database connection
+	db *sqlx.DB
 }
 
 // NewAPIHandlers creates a new APIHandlers
-func NewAPIHandlers(logger golog.Logger, cfg config.Config) APIHandlers {
+func NewAPIHandlers(logger golog.Logger, cfg config.Config, db *sqlx.DB) APIHandlers {
 	return APIHandlers{
 		logger: logger,
 		cfg:    cfg,
+		db:     db,
 	}
 }
 
@@ -33,4 +38,7 @@ func (a APIHandlers) SetupRouter(router *mux.Router) {
 
 	authLoginHandler := resp.WrapResponderHandler(auth.NewAuthLoginHandler(a.logger, a.cfg))
 	router.Handle("/auth/login", authLoginHandler).Methods("GET")
+
+	authExchangeHandler := resp.WrapResponderHandler(auth.NewAuthExchangeHandler(a.db))
+	router.Handle("/auth/exchange", authExchangeHandler).Methods("POST")
 }
