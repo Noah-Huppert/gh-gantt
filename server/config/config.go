@@ -11,11 +11,23 @@ type Config struct {
 	// Port to listen for HTTP requests on
 	Port int `required:"true"`
 
-	// GithubClientID
+	// GithubClientID is the server's GitHub application's client ID
 	GithubClientID string `required:"true" envconfig:"github_client_id"`
 
-	// GithubClientSecret
+	// GithubClientSecret is the server's GitHub application's client secret
 	GithubClientSecret string `required:"true" envconfig:"github_client_secret"`
+
+	// DBHost is the host of the database
+	DBHost string `required:"true" envconfig:"db_host"`
+
+	// DBName is the name of the database to save data in
+	DBName string `required:"true" envconfig:"db_name"`
+
+	// DBUsername is the username used to authenticate with the database
+	DBUsername string `required:"true" envconfig:"db_username"`
+
+	// DBPassword is ithe password used to authenticate with the database
+	DBPassword string `envconfig:"db_password"`
 }
 
 // NewConfig loads Config values from environment variables. Variables names
