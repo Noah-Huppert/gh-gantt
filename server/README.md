@@ -6,6 +6,7 @@ GH Gantt server.
 - [Configuration](#configuration)
 - [Dependencies](#dependencies)
 - [Run](#run)
+- [Development](#development)
 
 # Overview
 Provides the GH Gantt API and serves frontend assets.
@@ -38,3 +39,6 @@ Start the server:
 ```
 make run
 ```
+
+# Development
+See the [development guide](DEVELOPMENT.md) for details on how to develop.
