@@ -8,29 +8,14 @@ import (
 
 // Config holds application configuration
 type Config struct {
-	// Port to listen for HTTP requests on
-	Port int `required:"true"`
+	// HTTPConfig holds HTTP related application configuration
+	HTTPConfig
 
-	// GithubClientID is the server's GitHub application's client ID
-	GithubClientID string `required:"true" envconfig:"github_client_id"`
+	// GitHubConfig holds GitHub related application configuration
+	GitHubConfig
 
-	// GithubClientSecret is the server's GitHub application's client secret
-	GithubClientSecret string `required:"true" envconfig:"github_client_secret"`
-
-	// DBHost is the host of the database
-	DBHost string `required:"true" envconfig:"db_host"`
-
-	// DBPort is the port the database accepts connections on, defaults to 5432
-	DBPort int `default:"5432" envconfig:"db_port"`
-
-	// DBName is the name of the database to save data in
-	DBName string `required:"true" envconfig:"db_name"`
-
-	// DBUsername is the username used to authenticate with the database
-	DBUsername string `required:"true" envconfig:"db_username"`
-
-	// DBPassword is ithe password used to authenticate with the database
-	DBPassword string `envconfig:"db_password"`
+	// DBConfig holds database related application configuration
+	DBConfig
 }
 
 // NewConfig loads Config values from environment variables. Variables names
@@ -41,8 +26,7 @@ func NewConfig() (*Config, error) {
 
 	err := envconfig.Process("app", &cfg)
 	if err != nil {
-		return nil, fmt.Errorf("error loading configuration from "+
-			"the environment: %s", err.Error())
+		return nil, fmt.Errorf("error loading configuration from the environment: %s", err.Error())
 	}
 
 	return &cfg, nil

@@ -6,6 +6,7 @@ GH Gantt server.
 - [Configuration](#configuration)
 - [Dependencies](#dependencies)
 - [Run](#run)
+- [Development](#development)
 
 # Overview
 Provides the GH Gantt API and serves frontend assets.
@@ -23,14 +24,21 @@ dep ensure
 ```
 
 # Run
-Start the local Postgres database:
+## Database
+Start a local Postgres database:
 
 ```
 make db
 ```
 
+See the [Run Book](RUN-BOOK.md) for details on how to run database migrations.
+
+## Server
 Start the server:
 
 ```
 make run
 ```
+
+# Development
+See the [development guide](DEVELOPMENT.md) for details on how to develop.
