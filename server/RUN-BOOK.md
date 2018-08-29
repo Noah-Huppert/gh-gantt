@@ -3,29 +3,18 @@ GH Gantt Server run book.
 
 # Table Of Contents
 - [Database Migrations](#database-migrations)
-	- [Install Migration Tool](#install-migration-tool)
-	- [Run Migrations](#run-migrations)
 
 # Database Migrations
-Instructions on how to run database migrations.
+> Instructions on how to run database migrations.
 
-## Install Migration Tool
-The [Migrate tool](https://github.com/golang-migrate/migrate) is used to run database migrations.  
+The `script/db-migrate.go` script runs database migrations.
 
-1. Navigate to the [Migrate tool releases page](https://github.com/golang-migrate/migrate/releases) and download the 
-	binary for your platform.  
+Configuration is passed via the same database environment variables which are used to configure the API server. See the `config/db.go` file for details.  
 
-2. Decompress the binary download:
-   ```
-   tar -xzf binary-download.tar.gz
-   ```
+Run the script by executing:
 
-3. Move the binary download to a location of your choice (On linux the `/opt/` directory is a good choice)  
+```
+go run scripts/db-migrate.go
+```
 
-4. Add the binary download to your `PATH` environment variable
-	- On linux edit your shell profile file to include the install directory in your path
-      ```
-      export PATH="$PATH:/opt/migrate`
-      ```
-    - On Windows edit your system's environment variables in the settings
 
