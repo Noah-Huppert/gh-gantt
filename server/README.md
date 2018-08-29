@@ -23,12 +23,16 @@ dep ensure
 ```
 
 # Run
-Start the local Postgres database:
+## Database
+Start a local Postgres database:
 
 ```
 make db
 ```
 
+See the [Run Book](RUN-BOOK.md) for details on how to run database migrations.
+
+## Server
 Start the server:
 
 ```
