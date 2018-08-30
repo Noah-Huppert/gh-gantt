@@ -2,7 +2,15 @@
 GH Gantt development guide.
 
 # Table Of Contents
+- [Run Tests](#run-tests)
 - [Writing a DB Migration](#writing-a-db-migration)
+
+# Run Tests
+Execute tests by running:
+
+```
+make test
+```
 
 # Writing a DB Migration
 Database migrations are stored in the `server/migrations` directory.  

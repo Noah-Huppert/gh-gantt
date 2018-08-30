@@ -2,10 +2,12 @@ package models
 
 import (
 	"time"
+
+	"github.com/dchest/uniuri"
 )
 
 // GitHubLoginAttempt stores information about an GitHub OAuth to prevent cross site request forgery attacks
-type GithubLoginAttempt struct {
+type GitHubLoginAttempt struct {
 	// ID is the GitHub login attempt unique database identifier
 	ID int
 
@@ -16,4 +18,14 @@ type GithubLoginAttempt struct {
 	// This same value is passed to our OAuth callback endpoint and it should match the value passed at the start of the
 	// OAuth process. This value should be 32 characters long.
 	State string
+}
+
+// NewGitHubLoginAttempt creates a new GitHubLoginAttempt.
+// The CreatedOn time set to the current time and the State field set to a random 32 character long string. The ID
+// field will remain unset.
+func NewGitHubLoginAttempt() GitHubLoginAttempt {
+	return GitHubLoginAttempt{
+		CreatedOn: time.Now(),
+		State:     uniuri.NewLen(32),
+	}
 }
