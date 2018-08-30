@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/dchest/uniuri"
+	"github.com/jmoiron/sqlx"
 )
 
 // GitHubLoginAttempt stores information about an GitHub OAuth to prevent cross site request forgery attacks
@@ -28,4 +29,10 @@ func NewGitHubLoginAttempt() GitHubLoginAttempt {
 		CreatedOn: time.Now(),
 		State:     uniuri.NewLen(32),
 	}
+}
+
+// QueryByState attempts to find a GitHubLoginAttempt in the database with a matching State field. Returns sql.ErrNoRows
+// if a matching row is not found.
+func (a *GitHubLoginAttempt) QueryByState(db *sqlx.DB) error {
+	return db.Get(a, "SELECT id, created_on FROM github_login_attempts WHERE state = ?", a.State)
 }
