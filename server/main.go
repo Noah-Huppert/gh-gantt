@@ -6,10 +6,11 @@ import (
 	"os/signal"
 
 	"github.com/Noah-Huppert/gh-gantt/server/config"
-	"github.com/Noah-Huppert/gh-gantt/server/db"
+	"github.com/Noah-Huppert/gh-gantt/server/libdb"
 	"github.com/Noah-Huppert/gh-gantt/server/serve"
 
 	"github.com/Noah-Huppert/golog"
+	"github.com/jmoiron/sqlx"
 )
 
 func main() {
@@ -35,13 +36,18 @@ func main() {
 	}()
 
 	// Connect to database
-	db, err := db.Connect(cfg.DBConfig)
+	db, err := libdb.Connect(cfg.DBConfig)
 	if err != nil {
 		logger.Fatalf("error connecting to database: %s", err.Error())
 	}
 
+	dbx, err := sqlx.NewDb(db, "postgres")
+	if err != nil {
+		logger.Fatalf("error creating sqlx database instance from regular database instance: %s", err.Error())
+	}
+
 	// Start HTTP server
-	server := serve.NewServer(ctx, *cfg, db, logger)
+	server := serve.NewServer(ctx, *cfg, dbx, logger)
 
 	err = server.Serve()
 	if err != nil {
