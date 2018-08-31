@@ -2,8 +2,24 @@
 GH Gantt development guide.
 
 # Table Of Contents
+- [Run Local Database](#run-local-database)
 - [Run Tests](#run-tests)
 - [Writing a DB Migration](#writing-a-db-migration)
+
+# Run Local Database
+The `scripts/db.sh` script starts a local PostgreSQL server.  
+
+The environment to start the database for can be passed as the first command line argument. If not provided the 
+environment defaults to `dev`.
+
+Usage: `./scripts/db.sh [ENV]`  
+
+Examples:
+
+- `./scripts/db.sh`
+- `./scripts/db.sh test`
+
+*Note: `prod` cannot be passed as a valid `ENV` value*
 
 # Run Tests
 Execute tests by running:

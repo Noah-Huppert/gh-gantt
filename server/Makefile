@@ -1,4 +1,4 @@
-.PHONY: run test db
+.PHONY: run test
 
 DB_NAME=dev-gh-gantt
 DB_USERNAME=dev-gh-gantt
@@ -11,14 +11,3 @@ run:
 # test source code
 test:
 	go test ./...
-
-# db starts a local database
-db:
-	docker run \
-		-it \
-		--rm \
-		--net host \
-		-v ${DB_DATA_DIR}:/var/lib/postgresql/data \
-		-e POSTGRES_DB=${DB_NAME} \
-		-e POSTGRES_USER=${DB_USERNAME} \
-		postgres

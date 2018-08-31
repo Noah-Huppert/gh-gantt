@@ -28,7 +28,7 @@ dep ensure
 Start a local Postgres database:
 
 ```
-make db
+./scripts/db.sh
 ```
 
 See the [Run Book](RUN-BOOK.md) for details on how to run database migrations.
