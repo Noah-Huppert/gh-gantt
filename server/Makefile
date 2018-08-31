@@ -12,4 +12,4 @@ db:
 
 # test source code
 test:
-	go test ./...
+	./scripts/test.sh
