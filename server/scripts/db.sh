@@ -19,7 +19,7 @@
 opt_no_tty="false"
 
 while [ ! -z "$1" ]; do
-	if [[ "$1" == "--no_tty" ]]; then
+	if [[ "$1" == "--no-tty" ]]; then
 		opt_no_tty="true"
 	else
 		db_env="$1"
@@ -45,16 +45,15 @@ echo "#######################"
 echo "# Starting PostgreSQL #"
 echo "#######################"
 echo "Env           : $db_env"
+echo "No TTY        : $opt_no_tty"
 echo "Data directory: $db_data_dir"
 echo "DB Name       : $db_name"
 echo "DB Username   : $db_username"
 
 # Run
-#mkdir -p "$db_data_dir"
-
 run_args="i"
 
-if [[ "$opt_no_tty" == "true" ]]; then
+if [[ "$opt_no_tty" == "false" ]]; then
 	run_args="${run_args}t"
 fi
 

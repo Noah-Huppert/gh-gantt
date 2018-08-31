@@ -13,8 +13,18 @@ echo "#####################"
 echo "# Starting Database #"
 echo "#####################"
 
+db_log_f="/tmp/gh-gantt-test-db.out"
+
+function show_db_logs() {
+	# Show database logs on error
+	echo "Database logs"
+	echo "vvvvvvvvvvvvv"
+
+	cat $db_log_f
+}
+
 cd "$(dirname $0)" && \
-	./db.sh "test" --no-tty > /dev/null &
+	./db.sh "test" --no-tty &> $db_log_f &
 
 db_pid="$!"
 
@@ -25,7 +35,11 @@ started="false"
 for i in $(seq 10); do
 	# Check if process is running
 	if ! kill -0 "$db_pid" &> /dev/null; then
+		echo
 		echo "Failed to start database" >&2
+
+		show_db_logs
+
 		exit 1
 	fi
 
@@ -42,9 +56,14 @@ for i in $(seq 10); do
 done
 
 if [[ "$started" == "true" ]]; then
+	echo
 	echo "Started"
 else
+	echo
 	echo "Failed to start database" >&2
+
+	show_db_logs
+
 	exit 1
 fi
 
