@@ -2,24 +2,52 @@
 GH Gantt development guide.
 
 # Table Of Contents
+- [Run API Server](#run-api-server)
 - [Run Local Database](#run-local-database)
+- [Configure](#configure)
+- [Install Dependencies](#install-dependencies)
 - [Run Tests](#run-tests)
 - [Writing a DB Migration](#writing-a-db-migration)
 
+# Run API Server
+First [start a local database](#run-local-database).  
+
+Then [set configuration values](#configure).  
+
+Next [install dependencies](#install-dependencies).  
+
+Finally start the server:
+
+```
+make run
+```
+
 # Run Local Database
-The `scripts/db.sh` script starts a local PostgreSQL server.  
+The `db` Make target starts a local PostgreSQL server.  
 
 The environment to start the database for can be passed as the first command line argument. If not provided the 
 environment defaults to `dev`.
 
-Usage: `./scripts/db.sh [ENV]`  
+Usage: `make db [ENV=ENV]`  
 
 Examples:
 
-- `./scripts/db.sh`
-- `./scripts/db.sh test`
+- `make db`
+- `make db ENV=test`
 
 *Note: `prod` cannot be passed as a valid `ENV` value*
+
+# Configure
+Application configuration is provided via environment variables.  
+
+See the [`config/config.go`](config/config.go) file for more information.
+
+# Install Dependencies
+Install Go dependencies with [Dep](https://golang.github.io/dep/):
+
+```
+dep ensure
+```
 
 # Run Tests
 Execute tests by running:
