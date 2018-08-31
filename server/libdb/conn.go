@@ -1,6 +1,7 @@
-package db
+package libdb
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/Noah-Huppert/gh-gantt/server/config"
@@ -9,7 +10,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Connect(dbCfg config.DBConfig) (*sqlx.DB, error) {
+// Connect to a PostgreSQL database
+func Connect(dbCfg config.DBConfig) (*sql.DB, error) {
 	sqlConnStr := fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable", dbCfg.DBHost, dbCfg.DBPort,
 		dbCfg.DBName, dbCfg.DBUsername)
 
@@ -17,7 +19,7 @@ func Connect(dbCfg config.DBConfig) (*sqlx.DB, error) {
 		sqlConnStr += fmt.Sprintf("password=%s", dbCfg.DBPassword)
 	}
 
-	db, err := sqlx.Connect("postgres", sqlConnStr)
+	db, err := sql.Open("postgres", sqlConnStr)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to the database: %s", err.Error())
 	}
