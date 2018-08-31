@@ -1,12 +1,14 @@
-.PHONY: run test
-
-DB_NAME=dev-gh-gantt
-DB_USERNAME=dev-gh-gantt
-DB_DATA_DIR=${PWD}/run-data
+.PHONY: run db test
 
 # run server
 run:
 	go run main.go
+
+# db runs a local PostgreSQL server
+# Args:
+#	- ENV: Environment to run database for, defaults to "dev"
+db:
+	./scripts/db.sh "${ENV}"
 
 # test source code
 test:
