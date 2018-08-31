@@ -37,7 +37,7 @@ echo "DB Name       : $db_name"
 echo "DB Username   : $db_username"
 
 # Run
-mkdir -p "$db_data"
+mkdir -p "$db_data_dir"
 docker run \
 	-it \
 	--rm \
