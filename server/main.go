@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 
@@ -36,7 +35,7 @@ func main() {
 	}()
 
 	// Connect to database
-	db, err := db.Connect(cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBUsername, cfg.DBPassword)
+	db, err := db.Connect(cfg.DBConfig)
 	if err != nil {
 		logger.Fatalf("error connecting to database: %s", err.Error())
 	}

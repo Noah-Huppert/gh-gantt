@@ -9,7 +9,7 @@ import (
 
 // ConnTestDB connects to the database
 func ConnTestDB() (*sqlx.DB, error) {
-	dbCfg := DBConfig{
+	dbCfg := config.DBConfig{
 		DBHost:     "localhost",
 		DBPort:     5432,
 		DBName:     "test-gh-gantt",
