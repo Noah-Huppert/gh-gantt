@@ -2,16 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 
 	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/libdb"
 	"github.com/Noah-Huppert/gh-gantt/server/serve"
 
 	"github.com/Noah-Huppert/golog"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -37,16 +35,9 @@ func main() {
 	}()
 
 	// Connect to database
-	sqlConnStr := fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable",
-		cfg.DBHost, cfg.DBPort, cfg.DBName, cfg.DBUsername)
-
-	if len(cfg.DBPassword) > 0 {
-		sqlConnStr += fmt.Sprintf("password=%s", cfg.DBPassword)
-	}
-
-	db, err := sqlx.Connect("postgres", sqlConnStr)
+	db, err := libdb.ConnectX(cfg.DBConfig)
 	if err != nil {
-		logger.Fatalf("error connecting to the database: %s", err.Error())
+		logger.Fatalf("failed to connect to database: %s", err.Error())
 	}
 
 	// Start HTTP server
