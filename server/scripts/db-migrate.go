@@ -1,9 +1,6 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
-
 	"github.com/Noah-Huppert/gh-gantt/server/config"
 	"github.com/Noah-Huppert/gh-gantt/server/libdb"
 
@@ -21,7 +18,7 @@ func main() {
 	}
 
 	// Connect to database
-	db, err := libdb.Connect(cfg)
+	db, err := libdb.Connect(*cfg)
 	if err != nil {
 		logger.Fatalf("failed to connect to database: %s", err.Error())
 	}
