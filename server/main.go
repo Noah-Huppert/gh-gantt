@@ -10,7 +10,6 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/server/serve"
 
 	"github.com/Noah-Huppert/golog"
-	"github.com/jmoiron/sqlx"
 )
 
 func main() {
@@ -36,18 +35,13 @@ func main() {
 	}()
 
 	// Connect to database
-	db, err := libdb.Connect(cfg.DBConfig)
+	db, err := libdb.ConnectX(cfg.DBConfig)
 	if err != nil {
-		logger.Fatalf("error connecting to database: %s", err.Error())
-	}
-
-	dbx, err := sqlx.NewDb(db, "postgres")
-	if err != nil {
-		logger.Fatalf("error creating sqlx database instance from regular database instance: %s", err.Error())
+		logger.Fatalf("failed to connect to database: %s", err.Error())
 	}
 
 	// Start HTTP server
-	server := serve.NewServer(ctx, *cfg, dbx, logger)
+	server := serve.NewServer(ctx, *cfg, db, logger)
 
 	err = server.Serve()
 	if err != nil {
