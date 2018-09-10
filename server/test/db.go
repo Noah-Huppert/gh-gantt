@@ -2,7 +2,7 @@ package test
 
 import (
 	"github.com/Noah-Huppert/gh-gantt/server/config"
-	"github.com/Noah-Huppert/gh-gantt/server/db"
+	"github.com/Noah-Huppert/gh-gantt/server/libdb"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -16,5 +16,5 @@ func ConnTestDB() (*sqlx.DB, error) {
 		DBUsername: "test-gh-gantt",
 	}
 
-	return db.Connect(dbCfg)
+	return libdb.ConnectX(dbCfg)
 }
