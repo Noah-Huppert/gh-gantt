@@ -17,10 +17,12 @@ db_log_f="/tmp/gh-gantt-test-db.out"
 
 function show_db_logs() {
 	# Show database logs on error
-	echo "Database logs"
-	echo "vvvvvvvvvvvvv"
+	echo "Database logs:"
+	echo "VVVVVVVVVVVVVVVVVVVVVVV"
 
 	cat $db_log_f
+
+	echo "NNNNNNNNNNNNNNNNNNNNNNN"
 }
 
 cd "$(dirname $0)" && \
