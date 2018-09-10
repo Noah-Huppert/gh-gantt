@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dchest/uniuri"
@@ -35,4 +36,31 @@ func NewGitHubLoginAttempt() GitHubLoginAttempt {
 // if a matching row is not found.
 func (a *GitHubLoginAttempt) QueryByState(db *sqlx.DB) error {
 	return db.Get(a, "SELECT id, created_on FROM github_login_attempts WHERE state = ?", a.State)
+}
+
+// Save login attempt to the database
+func (a GitHubLoginAttempt) Save(db *sqlx.DB) error {
+	// Start transaction
+	tx, err := db.Begin()
+
+	if err != nil {
+		return fmt.Errorf("error starting transaction: %s", err.Error())
+	}
+
+	// Insert
+	_, err = tx.Exec("INSERT INTO github_login_attempts (created_on, state) VALUES(?, ?)", a.CreatedOn, a.State)
+
+	if err != nil {
+		return fmt.Errorf("error inserting GitHub login attempt: %s", err.Error())
+	}
+
+	// Commit transaction
+	err = tx.Commit()
+
+	if err != nil {
+		return fmt.Errorf("error committing transaction: %s", err.Error())
+	}
+
+	// Done
+	return nil
 }
