@@ -31,6 +31,10 @@ while [ ! -z "$1" ]; do
 	shift
 done
 
+if [ -z "$db_env" ]; then
+	db_env="dev"
+fi
+
 if [[ "$db_env" == "prod" ]]; then
 	echo "Error: ENV argument value cannot be \"prod\"" >&2
 	exit 1
@@ -56,7 +60,6 @@ run_args="i"
 if [[ "$opt_no_tty" == "false" ]]; then
 	run_args="${run_args}t"
 fi
-
 docker run \
 	-$run_args \
 	--rm \
