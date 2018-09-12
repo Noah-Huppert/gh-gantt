@@ -11,7 +11,7 @@ import (
 // GitHubLoginAttempt stores information about an GitHub OAuth to prevent cross site request forgery attacks
 type GitHubLoginAttempt struct {
 	// ID is the GitHub login attempt unique database identifier
-	ID int
+	ID int64
 
 	// CreatedOn stores the date a login attempt was created. Login attempts older than 5 minutes should be deleted
 	CreatedOn time.Time
@@ -38,8 +38,8 @@ func (a *GitHubLoginAttempt) QueryByState(db *sqlx.DB) error {
 	return db.Get(a, "SELECT id, created_on FROM github_login_attempts WHERE state = ?", a.State)
 }
 
-// Insert login attempt into the database
-func (a GitHubLoginAttempt) Insert(db *sqlx.DB) error {
+// Insert a GitHub login attempt into the database. The new row's ID will be saved under the GitHubLoginAttempt.ID field
+func (a *GitHubLoginAttempt) Insert(db *sqlx.DB) error {
 	// Start transaction
 	tx, err := db.Begin()
 
@@ -48,11 +48,20 @@ func (a GitHubLoginAttempt) Insert(db *sqlx.DB) error {
 	}
 
 	// Insert
-	_, err = tx.Exec("INSERT INTO github_login_attempts (created_on, state) VALUES(?, ?)", a.CreatedOn, a.State)
+	res, err = tx.Exec("INSERT INTO github_login_attempts (created_on, state) VALUES(?, ?)", a.CreatedOn, a.State)
 
 	if err != nil {
 		return fmt.Errorf("error inserting GitHub login attempt: %s", err.Error())
 	}
+
+	// Record inserted row's id in struct
+	id, err := a.LastInsertId()
+
+	if err != nil {
+		return fmt.Errorf("error retrieving the inserted GitHub login attempt's id: %s", err.Error())
+	}
+
+	a.ID = id
 
 	// Commit transaction
 	err = tx.Commit()
