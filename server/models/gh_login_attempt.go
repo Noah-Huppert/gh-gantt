@@ -38,8 +38,8 @@ func (a *GitHubLoginAttempt) QueryByState(db *sqlx.DB) error {
 	return db.Get(a, "SELECT id, created_on FROM github_login_attempts WHERE state = ?", a.State)
 }
 
-// Save login attempt to the database
-func (a GitHubLoginAttempt) Save(db *sqlx.DB) error {
+// Insert login attempt into the database
+func (a GitHubLoginAttempt) Insert(db *sqlx.DB) error {
 	// Start transaction
 	tx, err := db.Begin()
 
