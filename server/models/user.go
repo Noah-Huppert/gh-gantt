@@ -14,3 +14,13 @@ type User struct {
 	// ProfilePictureURL is the URL of the user's GitHub profile picture
 	ProfilePictureURL string
 }
+
+// NewUser creates a new User
+func NewUser(ghID, name, login, profilePicURL string) *User {
+	return &User{
+		GitHubID:          ghID,
+		Name:              name,
+		Login:             login,
+		ProfilePictureURL: profilePicURL,
+	}
+}
