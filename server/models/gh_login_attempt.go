@@ -26,8 +26,8 @@ type GitHubLoginAttempt struct {
 // NewGitHubLoginAttempt creates a new GitHubLoginAttempt.
 // The CreatedOn time set to the current time and the State field set to a random 32 character long string. The ID
 // field will remain unset.
-func NewGitHubLoginAttempt() GitHubLoginAttempt {
-	return GitHubLoginAttempt{
+func NewGitHubLoginAttempt() &GitHubLoginAttempt {
+	return &GitHubLoginAttempt{
 		CreatedOn: time.Now(),
 		State:     uniuri.NewLen(32),
 	}
