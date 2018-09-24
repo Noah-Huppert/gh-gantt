@@ -26,7 +26,7 @@ type GitHubLoginAttempt struct {
 // NewGitHubLoginAttempt creates a new GitHubLoginAttempt.
 // The CreatedOn time set to the current time and the State field set to a random 32 character long string. The ID
 // field will remain unset.
-func NewGitHubLoginAttempt() &GitHubLoginAttempt {
+func NewGitHubLoginAttempt() *GitHubLoginAttempt {
 	return &GitHubLoginAttempt{
 		CreatedOn: time.Now(),
 		State:     uniuri.NewLen(32),
@@ -36,7 +36,7 @@ func NewGitHubLoginAttempt() &GitHubLoginAttempt {
 // QueryByState attempts to find a GitHubLoginAttempt in the database with a matching State field. Returns sql.ErrNoRows
 // if a matching row is not found.
 func (a *GitHubLoginAttempt) QueryByState(db *sqlx.DB) error {
-	return db.Get(a, "SELECT id, created_on FROM github_login_attempts WHERE state = ?", a.State)
+	return db.Get(a, "SELECT id, created_on FROM github_login_attempts WHERE state = $1", a.State)
 }
 
 // Insert a GitHub login attempt into the database. The new row's id will be saved under the ID field
@@ -48,18 +48,10 @@ func (a *GitHubLoginAttempt) Insert(db *sqlx.DB) error {
 	}
 
 	// Insert
-	res, err = tx.Exec("INSERT INTO github_login_attempts (created_on, state) VALUES(?, ?)", a.CreatedOn, a.State)
+	err = tx.QueryRowx("INSERT INTO github_login_attempts (created_on, state) VALUES($1, $2) RETURNING id", a.CreatedOn, a.State).StructScan(a)
 	if err != nil {
 		return fmt.Errorf("error executing insert statement: %s", err.Error())
 	}
-
-	// Record inserted row's id in struct
-	id, err := a.LastInsertId()
-	if err != nil {
-		return fmt.Errorf("error retrieving the inserted row's id: %s", err.Error())
-	}
-
-	a.ID = id
 
 	// Commit transaction
 	err = tx.Commit()
@@ -83,7 +75,7 @@ func (a GitHubLoginAttempt) Delete(db *sqlx.DB) error {
 	}
 
 	// Delete
-	res, err := tx.Exec("DELETE FROM github_login_attempts WHERE id = ?", a.ID)
+	res, err := tx.Exec("DELETE FROM github_login_attempts WHERE id = $1", a.ID)
 	if err != nil {
 		return fmt.Errorf("error executing delete statement: %s", err.Error())
 	}

@@ -33,5 +33,5 @@ func NewUser(ghID, name, login, profilePicURL string) *User {
 //
 // Returns an error if one occurs. Returns sql.ErrNoRows if a matching User is not found.
 func (u *User) QueryByGitHubID(db *sqlx.DB) error {
-	return db.Get(u, "SELECT name, login, profile_picture_url FROM users WHERE github_id = ?", u.GitHubID)
+	return db.Get(u, "SELECT name, login, profile_picture_url FROM users WHERE github_id = $1", u.GitHubID)
 }
