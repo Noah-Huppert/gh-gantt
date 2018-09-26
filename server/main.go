@@ -6,6 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/encryption"
 	"github.com/Noah-Huppert/gh-gantt/server/libdb"
 	"github.com/Noah-Huppert/gh-gantt/server/serve"
 
@@ -24,6 +25,19 @@ func main() {
 	if err != nil {
 		logger.Fatalf("error loading configuration: %s", err.Error())
 	}
+
+	cipherText, err := encryption.AESEncrypt([]byte(cfg.ThirdPartyAuthTokenEncryptionSecret), []byte("to encrypt"))
+	if err != nil {
+		logger.Fatalf("error encrypting: %s", err.Error())
+	}
+	logger.Debugf("encrypted: %s", string(cipherText))
+
+	plainText, err := encryption.AESDecrypt([]byte(cfg.ThirdPartyAuthTokenEncryptionSecret), cipherText)
+	if err != nil {
+		logger.Fatalf("error decrypting: %s", err.Error())
+	}
+	logger.Debugf("decrypted: %s", string(plainText))
+	return
 
 	// Cancel context on interrupt signal
 	interruptChan := make(chan os.Signal, 1)
