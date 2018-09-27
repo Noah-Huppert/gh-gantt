@@ -6,6 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/encryption"
 	"github.com/Noah-Huppert/gh-gantt/server/libdb"
 	"github.com/Noah-Huppert/gh-gantt/server/serve"
 
@@ -23,6 +24,12 @@ func main() {
 	cfg, err := config.NewConfig()
 	if err != nil {
 		logger.Fatalf("error loading configuration: %s", err.Error())
+	}
+
+	// Compute encryption keys from configuration values
+	authTokenEncryptionKey, err := encryption.ComputeKey(cfg.AuthTokenEncryptionSecret)
+	if err != nil {
+		logger.Fatalf("error computing auth token encryption key: %s", err.Error())
 	}
 
 	// Cancel context on interrupt signal
