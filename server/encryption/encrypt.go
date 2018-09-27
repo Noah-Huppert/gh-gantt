@@ -31,7 +31,7 @@ func AESEncrypt(key []byte, plainText []byte) ([]byte, error) {
 	}
 
 	// Encrypt
-	cipherText := gcmCipher.Seal(nil, nonce, plainText, nil)
+	cipherText := gcmCipher.Seal(nonce, nonce, plainText, nil)
 
 	return cipherText, nil
 }
