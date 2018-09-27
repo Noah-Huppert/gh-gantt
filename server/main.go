@@ -26,18 +26,11 @@ func main() {
 		logger.Fatalf("error loading configuration: %s", err.Error())
 	}
 
-	cipherText, err := encryption.AESEncrypt([]byte(cfg.ThirdPartyAuthTokenEncryptionSecret), []byte("to encrypt"))
+	// Compute encryption keys from configuration values
+	authTokenEncryptionKey, err := encryption.ComputeKey(cfg.AuthTokenEncryptionSecret)
 	if err != nil {
-		logger.Fatalf("error encrypting: %s", err.Error())
+		logger.Fatalf("error computing auth token encryption key: %s", err.Error())
 	}
-	logger.Debugf("encrypted: %s", string(cipherText))
-
-	plainText, err := encryption.AESDecrypt([]byte(cfg.ThirdPartyAuthTokenEncryptionSecret), cipherText)
-	if err != nil {
-		logger.Fatalf("error decrypting: %s", err.Error())
-	}
-	logger.Debugf("decrypted: %s", string(plainText))
-	return
 
 	// Cancel context on interrupt signal
 	interruptChan := make(chan os.Signal, 1)
