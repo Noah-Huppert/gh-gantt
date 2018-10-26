@@ -17,8 +17,8 @@ type Config struct {
 	// DBConfig holds database related application configuration
 	DBConfig
 
-	// EncryptionConfig holds encryption related configuration
-	EncryptionConfig
+	// AuthConfig holds user authentication related application configuration
+	AuthConfig
 }
 
 // NewConfig loads Config values from environment variables. Variables names
