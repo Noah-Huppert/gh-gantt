@@ -1,1 +1,0 @@
-DROP TABLE github_authentication_tokens
