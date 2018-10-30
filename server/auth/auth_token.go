@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/fatih/structs"
 )
 
 // AuthToken is issued to a user to prove they are authenticated
@@ -23,8 +22,8 @@ type AuthToken struct {
 }
 
 // claims returns a map of JWT claims to encode
-func (t AuthToken) claims() map[string]string {
-	return map[string]string{
+func (t AuthToken) claims() map[string]interface{} {
+	return map[string]interface{}{
 		"iss":               t.Issuer,
 		"aud":               t.Audience,
 		"sub":               t.GitHubUserID,

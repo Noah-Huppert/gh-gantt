@@ -1,44 +1,53 @@
 package auth
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"math/rand"
 	"strings"
 
-	"github.com/thanhpk/randstr"
 	"golang.org/x/crypto/ed25519"
 )
 
 // RawStateBytesLen is the number of bytes a raw state bytes array should contain
 const RawStateBytesLen int = 32
 
-// MakeStateBytes return a series of signed bytes used as the GH auth state
+// MakeState return a series of signed bytes which are base64 encoded. Used as the GH auth state.
 // The returned value is in the format: `<state>.<state signature>`
-func MakeStateBytes(stateSigningPrivKey []byte) []byte {
+func MakeState(stateSigningPrivKey []byte) string {
 	// Get raw bytes to sign
-	rawState := randstr.Byte(RawStateBytesLen)
+	stateBytes := make([]byte, RawStateBytesLen)
+	rand.Read(stateBytes)
 
 	// Sign raw bytes
-	stateSignature := ed25519.Sign(stateSigningPrivKey, rawState)
+	stateSignature := ed25519.Sign(stateSigningPrivKey, stateBytes)
 
 	// Format
-	formattedState := fmt.Sprintf("%s.%s", rawState, stateSignature)
+	formattedState := fmt.Sprintf("%s.%s", stateBytes, stateSignature)
 
-	return []byte(formattedState)
+	// Base64 encode
+	return base64.StdEncoding.EncodeToString([]byte(formattedState))
 }
 
 // VerifyStateBytes checks to see if a series of bytes was signed by the GH auth state signing key
 // The provided state is expected to be in the format: `<state>.<signed state>`
-func VerifyStateBytes(stateSigningPubKey, state []byte) (bool, error) {
+func VerifyStateBytes(stateSigningPubKey []byte, state string) (bool, error) {
+	// Base64 Decode
+	b64DecodedState, err := base64.StdEncoding.DecodeString(state)
+	if err != nil {
+		return false, fmt.Errorf("error base64 decoding state: %s", err.Error())
+	}
+
 	// Separate state parts
-	parts := strings.Split(string(state), ".")
+	parts := strings.Split(string(b64DecodedState), ".")
 
 	if len(parts) != 2 {
 		return false, errors.New("state not in format: <state>.<state signature>")
 	}
 
-	state = []byte(parts[0])
-	stateSignature = []byte(parts[1])
+	stateBytes := []byte(parts[0])
+	stateSignature := []byte(parts[1])
 
-	return ed25519.Verify(stateSigningPubKey, state, stateSignature)
+	return ed25519.Verify([]byte(stateSigningPubKey), stateBytes, stateSignature), nil
 }

@@ -30,7 +30,7 @@ The server uses a ed25519 keypair to sign a `state` field in GitHub authenticati
 Generate this key by running:
 
 ```
-./scripts/gen-gh-state-signing-key.sh
+go run ./scripts/gen-gh-state-signing-key.go
 ```
 
 This will save the key in the appropriate configuration environment variables in the `.env` file.
