@@ -43,7 +43,8 @@ func (s Server) Serve() error {
 	apiHandlers := api.NewAPIHandlers(s.logger, s.cfg)
 	apiHandlers.SetupRouter(apiRouter)
 
-	router.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
+	//router.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("../frontend/dist")))
 
 	// Setup recovery handler
 	recoveryHandler := NewRecoveryHandler(router, s.logger.GetChild("recovery"))

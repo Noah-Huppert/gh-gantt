@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Noah-Huppert/gh-gantt/server/auth"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
@@ -37,8 +38,10 @@ func (h AuthLoginHandler) Handle(r *http.Request) resp.Responder {
 			"error building GitHub OAuth redirect URL", err.Error())
 	}
 
+	// Set query params
 	queryParams := redirectURL.Query()
 	queryParams.Set("client_id", h.cfg.GithubClientID)
+	queryParams.Set("state", auth.MakeState(h.cfg.GetGHStateSigningPrivKey()))
 
 	redirectURL.RawQuery = queryParams.Encode()
 
