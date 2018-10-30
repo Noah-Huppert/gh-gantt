@@ -6,7 +6,6 @@ import (
 	"os/signal"
 
 	"github.com/Noah-Huppert/gh-gantt/server/config"
-	"github.com/Noah-Huppert/gh-gantt/server/libdb"
 	"github.com/Noah-Huppert/gh-gantt/server/serve"
 
 	"github.com/Noah-Huppert/golog"
@@ -34,14 +33,8 @@ func main() {
 		ctxCancel()
 	}()
 
-	// Connect to database
-	db, err := libdb.ConnectX(cfg.DBConfig)
-	if err != nil {
-		logger.Fatalf("failed to connect to database: %s", err.Error())
-	}
-
 	// Start HTTP server
-	server := serve.NewServer(ctx, *cfg, db, logger)
+	server := serve.NewServer(ctx, *cfg, logger)
 
 	err = server.Serve()
 	if err != nil {

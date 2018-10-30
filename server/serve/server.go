@@ -10,7 +10,6 @@ import (
 
 	"github.com/Noah-Huppert/golog"
 	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
 )
 
 // Server responds to HTTP requests
@@ -21,19 +20,15 @@ type Server struct {
 	// cfg is the application configuration
 	cfg config.Config
 
-	// db is a database connection
-	db *sqlx.DB
-
 	// logger is used to record run information
 	logger golog.Logger
 }
 
 // NewServer creates a Server
-func NewServer(ctx context.Context, cfg config.Config, db *sqlx.DB, logger golog.Logger) Server {
+func NewServer(ctx context.Context, cfg config.Config, logger golog.Logger) Server {
 	return Server{
 		ctx:    ctx,
 		cfg:    cfg,
-		db:     db,
 		logger: logger,
 	}
 }
@@ -45,7 +40,7 @@ func (s Server) Serve() error {
 
 	apiRouter := router.PathPrefix("/api/v0").Subrouter()
 
-	apiHandlers := api.NewAPIHandlers(s.logger, s.cfg, s.db)
+	apiHandlers := api.NewAPIHandlers(s.logger, s.cfg)
 	apiHandlers.SetupRouter(apiRouter)
 
 	router.Handle("/", http.FileServer(http.Dir("../frontend/dist")))
