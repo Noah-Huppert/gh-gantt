@@ -1,1 +1,1 @@
-export const OAUTH_CALLBACK = "OAUTH_CALLBACK"
+export const AUTH_TOKEN = "AUTH_TOKEN"

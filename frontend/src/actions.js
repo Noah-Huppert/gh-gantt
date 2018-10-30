@@ -1,8 +1,8 @@
-import { OAUTH_CALLBACK } from "./actionTypes";
+import { AUTH_TOKEN } from "./actionTypes";
 
-export const oauthCallback = tempOAuthCode => {
+export const authToken = authToken => {
 	return {
-		type: OAUTH_CALLBACK,
-		tempOAuthCode: tempOAuthCode
+		type: AUTH_TOKEN,
+		authToken: authToken
 	}
 }

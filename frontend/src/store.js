@@ -1,12 +1,12 @@
 import { createStore } from "redux"
-import { HELLO } from "./actionTypes"
+import { AUTH_TOKEN } from "./actionTypes"
 
 function reducer(state = {}, action) {
 	switch (action.type) {
-		case HELLO:
+		case AUTH_TOKEN:
 			return {
 				...state,
-				hello: "world"
+				authToken: action.authToken
 			}
 		default:
 			return state
