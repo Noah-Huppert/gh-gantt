@@ -31,9 +31,16 @@ func (a APIHandlers) SetupRouter(router *mux.Router) {
 	healthHandler := resp.WrapResponderHandler(NewHealthCheckHandler())
 	router.Handle("/healthz", healthHandler).Methods("GET")
 
-	authLoginHandler := resp.WrapResponderHandler(auth.NewAuthLoginHandler(a.logger, a.cfg))
+	// Authentication
+	authLogger := a.logger.GetChild("auth")
+
+	// ... Login
+	authLoginLogger := authLogger.GetChild("auth.login")
+	authLoginHandler := resp.WrapResponderHandler(auth.NewAuthLoginHandler(authLoginLogger, a.cfg))
 	router.Handle("/auth/login", authLoginHandler).Methods("GET")
 
-	authExchangeHandler := resp.WrapResponderHandler(auth.NewAuthExchangeHandler())
+	// ... Exchange
+	authExchangeLogger := authLogger.GetChild("auth.exchange")
+	authExchangeHandler := resp.WrapResponderHandler(auth.NewAuthExchangeHandler(authExchangeLogger))
 	router.Handle("/auth/exchange", authExchangeHandler).Methods("POST")
 }

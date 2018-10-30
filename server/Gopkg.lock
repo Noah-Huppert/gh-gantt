@@ -14,12 +14,6 @@
   version = "v3.2.0"
 
 [[projects]]
-  name = "github.com/fatih/structs"
-  packages = ["."]
-  revision = "4966fc68f5b7593aafa6cbbba2d65ec6e1416047"
-  version = "v1.1.0"
-
-[[projects]]
   name = "github.com/golang-migrate/migrate"
   packages = [".","database","database/postgres","source","source/file"]
   revision = "e968e8a5f0fd43301a2e0ef025ce6db56eedb205"
@@ -61,9 +55,15 @@
   packages = ["ed25519","ed25519/internal/edwards25519"]
   revision = "bc7917b19d8f099105de72dc62898400be07c984"
 
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/validator.v2"
+  packages = ["."]
+  revision = "135c24b11c19e52befcae2ec3fca5d9b78c4e98e"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "77c6ccd34b386b6db265bf72f6b4c10d12e442cd6262128d2caacaf49e4cb9fc"
+  inputs-digest = "1539ca9dc58346efcf0e42218ceefedf9e9b8ea0aa86417b9fe1f48d46a7c7c1"
   solver-name = "gps-cdcl"
   solver-version = 1
