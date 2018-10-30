@@ -1,5 +1,0 @@
-CREATE TABLE github_login_attempts (
-	id SERIAL PRIMARY KEY,
-	created_on TIMESTAMP WITH TIME ZONE NOT NULL,
-	state VARCHAR(32) NOT NULL
-)
