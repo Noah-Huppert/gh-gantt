@@ -1,13 +1,37 @@
 import { createStore } from "redux"
-import { AUTH_TOKEN } from "./actionTypes"
+import { GH_AUTH_REDIRECTED,
+	GH_AUTH_BAD_REDIRECT,
+	GH_AUTH_BAD_TOKEN_EXCHANGE,
+	GH_AUTH_TOKEN_EXCHANGE } from "./actionTypes"
 
-function reducer(state = {}, action) {
+const defaultState = {
+	auth: {
+		authToken: undefined,
+		gh: {
+			stage: undefined
+		}
+	}
+}
+
+function reducer(state = defaultState, action) {
 	switch (action.type) {
-		case AUTH_TOKEN:
-			return {
-				...state,
-				authToken: action.authToken
-			}
+		case GH_AUTH_REDIRECTED:
+			state.auth.gh.stage = GH_AUTH_REDIRECTED
+
+			return state
+
+		case GH_AUTH_BAD_REDIRECT:
+			state.auth.gh.stage = GH_AUTH_BAD_REDIRECT
+
+			return state
+
+		case GH_AUTH_BAD_TOKEN_EXCHANGE:
+			state.auth.gh.stage = GH_AUTH_BAD_TOKEN_EXCHANGE
+
+		case GH_AUTH_TOKEN_EXCHANGE:
+			state.auth.authToken = action.authToken
+
+			return state
 		default:
 			return state
 	}
