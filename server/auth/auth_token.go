@@ -34,7 +34,7 @@ func (t AuthToken) claims() map[string]string {
 
 func (t AuthToken) Encode(signingSecret string) (string, error) {
 	// Generate claims
-	var claims jwt.MapClaims = structs.Map(t)
+	var claims jwt.MapClaims = t.claims()
 
 	// Encode
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
