@@ -20,6 +20,18 @@
   revision = "8902c56451e9b58ff940bbe5fec35d5f9c04584a"
 
 [[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
+  name = "github.com/fatih/structs"
+  packages = ["."]
+  revision = "4966fc68f5b7593aafa6cbbba2d65ec6e1416047"
+  version = "v1.1.0"
+
+[[projects]]
   name = "github.com/golang-migrate/migrate"
   packages = [".","database","database/postgres","source","source/file"]
   revision = "e968e8a5f0fd43301a2e0ef025ce6db56eedb205"
@@ -50,10 +62,10 @@
   version = "v1.3.0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/lib/pq"
   packages = [".","oid"]
-  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
-  version = "v1.0.0"
+  revision = "9eb73efc1fcc404148b56765b0d3f61d9a5ef8ee"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -70,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6983a94e315cc70ae7ee453094c81240d5156ff394e3b7b730d36c9e31eed0f6"
+  inputs-digest = "8568a002c436de6bc0d67a9fb25aa40247d9f6cd7e37ea8197844285aedaa66c"
   solver-name = "gps-cdcl"
   solver-version = 1
