@@ -14,9 +14,6 @@ type Config struct {
 	// GitHubConfig holds GitHub related application configuration
 	GitHubConfig
 
-	// DBConfig holds database related application configuration
-	DBConfig
-
 	// AuthConfig holds user authentication related application configuration
 	AuthConfig
 }
