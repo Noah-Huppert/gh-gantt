@@ -41,6 +41,6 @@ func (a APIHandlers) SetupRouter(router *mux.Router) {
 
 	// ... Exchange
 	authExchangeLogger := authLogger.GetChild("auth.exchange")
-	authExchangeHandler := resp.WrapResponderHandler(auth.NewAuthExchangeHandler(authExchangeLogger))
+	authExchangeHandler := resp.WrapResponderHandler(auth.NewAuthExchangeHandler(authExchangeLogger, a.cfg))
 	router.Handle("/auth/exchange", authExchangeHandler).Methods("POST")
 }

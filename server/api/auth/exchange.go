@@ -3,6 +3,8 @@ package auth
 import (
 	"net/http"
 
+	"github.com/Noah-Huppert/gh-gantt/server/auth"
+	"github.com/Noah-Huppert/gh-gantt/server/config"
 	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
@@ -14,6 +16,9 @@ import (
 type AuthExchangeHandler struct {
 	// logger is used to output debug information
 	logger golog.Logger
+
+	// cfg is the application configuration
+	cfg config.Config
 }
 
 // AuthExchangeRequest is the format an auth exchange request
@@ -26,9 +31,10 @@ type AuthExchangeRequest struct {
 }
 
 // NewAuthExchangeHandler creates a new AuthExchangeHandler
-func NewAuthExchangeHandler(logger golog.Logger) AuthExchangeHandler {
+func NewAuthExchangeHandler(logger golog.Logger, cfg config.Config) AuthExchangeHandler {
 	return AuthExchangeHandler{
 		logger: logger,
+		cfg:    cfg,
 	}
 }
 
@@ -40,6 +46,17 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 	errResp := req.DecodeValidatedJSON(h.logger, r, &request)
 	if errResp != nil {
 		return errResp
+	}
+
+	// Check state
+	stateValid, err := auth.VerifyState(h.cfg.GetGHStateSigningPubKey(), request.State)
+	if err != nil {
+		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError, "error validating state parameter",
+			err.Error())
+	}
+
+	if !stateValid {
+		return resp.NewStrErrorResponder(h.logger, http.StatusBadRequest, "invalid state", "stateValud=false")
 	}
 
 	return resp.NewJSONResponder("ok", http.StatusOK)
