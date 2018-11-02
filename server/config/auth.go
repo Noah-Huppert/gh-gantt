@@ -6,6 +6,9 @@ import (
 
 // AuthConfig holds user authentication configuration
 type AuthConfig struct {
+	// ServiceName is the name of the GH Gantt server used in the AuthToken Issuer and Audience field
+	ServiceName string `required:"true" envconfig:"service_name"`
+
 	// SigningSecret is used to sign JWTs
 	SigningSecret string `required:"true" envconfig:"signing_secret"`
 
