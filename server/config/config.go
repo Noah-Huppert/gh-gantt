@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kelseyhightower/envconfig"
+	"gopkg.in/validator.v2"
 )
 
 // Config holds application configuration
@@ -24,9 +25,16 @@ type Config struct {
 func NewConfig() (*Config, error) {
 	var cfg Config
 
+	// Load from environment
 	err := envconfig.Process("app", &cfg)
 	if err != nil {
 		return nil, fmt.Errorf("error loading configuration from the environment: %s", err.Error())
+	}
+
+	// Validate
+	err = validator.Validate(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("error validating configuration: %s", err.Error())
 	}
 
 	return &cfg, nil

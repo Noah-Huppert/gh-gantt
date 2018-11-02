@@ -30,9 +30,9 @@ func MakeState(stateSigningPrivKey []byte) string {
 	return base64.StdEncoding.EncodeToString([]byte(formattedState))
 }
 
-// VerifyStateBytes checks to see if a series of bytes was signed by the GH auth state signing key
+// VerifyState checks to see if a series of bytes was signed by the GH auth state signing key
 // The provided state is expected to be in the format: `<state>.<signed state>`
-func VerifyStateBytes(stateSigningPubKey []byte, state string) (bool, error) {
+func VerifyState(stateSigningPubKey []byte, state string) (bool, error) {
 	// Base64 Decode
 	b64DecodedState, err := base64.StdEncoding.DecodeString(state)
 	if err != nil {
