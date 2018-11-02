@@ -59,5 +59,16 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 		return resp.NewStrErrorResponder(h.logger, http.StatusBadRequest, "invalid state", "stateValud=false")
 	}
 
+	// Exchange code
+	exchangeReq := auth.NewExchangeGitHubCodeReq(h.cfg, request.Code, request.State)
+
+	authToken, err := exchangeReq.Exchange()
+	if err != nil {
+		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
+			"error exchanging code for GitHub access token", err.Error())
+	}
+
+	h.logger.Debugf("authToken: %s", authToken)
+
 	return resp.NewJSONResponder("ok", http.StatusOK)
 }

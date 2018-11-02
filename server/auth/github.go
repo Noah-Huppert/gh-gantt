@@ -1,7 +1,8 @@
 package auth
 
 import (
-	"encoder/json"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -48,7 +49,9 @@ func NewExchangeGitHubCodeReq(cfg config.Config, code, state string) ExchangeGit
 func (r ExchangeGitHubCodeReq) Exchange() (string, error) {
 	// Encode request body
 	var body []byte
-	encoder := json.NewEncoder(body)
+	bodyBuffer := bytes.NewBuffer(body)
+
+	encoder := json.NewEncoder(bodyBuffer)
 
 	err := encoder.Encode(r)
 	if err != nil {
@@ -56,20 +59,20 @@ func (r ExchangeGitHubCodeReq) Exchange() (string, error) {
 	}
 
 	// Make request
-	resp, err := http.Post(exchangeGitHubCodeURL, "application/json", body)
+	resp, err := http.Post(exchangeGitHubCodeURL, "application/json", bodyBuffer)
 	if err != nil {
 		return "", fmt.Errorf("error making exchange GitHub API token request: %s", err.Error())
 	}
 
 	// Decode request
-	var resp exchangeGitHubCodeResp
+	var ghResp exchangeGitHubCodeResp
 	decoder := json.NewDecoder(resp.Body)
 
-	err = decoder.Decode(resp)
+	err = decoder.Decode(ghResp)
 	if err != nil {
 		return "", fmt.Errorf("error decoding exchange GitHub API response body: %s", err.Error())
 	}
 
 	// Success
-	return resp.AccessToken, nil
+	return ghResp.AccessToken, nil
 }

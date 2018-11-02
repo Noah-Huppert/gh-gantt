@@ -40,7 +40,7 @@ func (h AuthLoginHandler) Handle(r *http.Request) resp.Responder {
 
 	// Set query params
 	queryParams := redirectURL.Query()
-	queryParams.Set("client_id", h.cfg.GithubClientID)
+	queryParams.Set("client_id", h.cfg.GitHubClientID)
 	queryParams.Set("state", auth.MakeState(h.cfg.GetGHStateSigningPrivKey()))
 
 	redirectURL.RawQuery = queryParams.Encode()
