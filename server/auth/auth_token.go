@@ -21,6 +21,17 @@ type AuthToken struct {
 	GitHubAuthToken string
 }
 
+// NewAuthToken creates a new AuthToken.
+// The serviceName is used for the Issuer and Audience field
+func NewAuthToken(serviceName, ghUserID, ghAuthToken string) AuthToken {
+	return AuthToken{
+		Issuer:          serviceName,
+		Audience:        serviceName,
+		GitHubUserID:    ghUserID,
+		GitHubAuthToken: ghAuthToken,
+	}
+}
+
 // claims returns a map of JWT claims to encode
 func (t AuthToken) claims() map[string]interface{} {
 	return map[string]interface{}{
