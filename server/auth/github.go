@@ -32,6 +32,9 @@ type ExchangeGitHubCodeReq struct {
 type exchangeGitHubCodeResp struct {
 	// AccessToken is the long lasting GitHub authentication token
 	AccessToken string `json:"access_token"`
+
+	// Error is not empty if the GitHub API request failed
+	Error string `json:"error"`
 }
 
 // NewExchangeGitHubCodeReq creates a new ExchangeGitHubCodeReq. Most of the fields can be filled by passing an
@@ -49,28 +52,41 @@ func NewExchangeGitHubCodeReq(cfg config.Config, code, state string) ExchangeGit
 func (r ExchangeGitHubCodeReq) Exchange() (string, error) {
 	// Encode request body
 	var body []byte
-	bodyBuffer := bytes.NewBuffer(body)
+	reqBodyBuffer := bytes.NewBuffer(body)
 
-	encoder := json.NewEncoder(bodyBuffer)
+	encoder := json.NewEncoder(reqBodyBuffer)
 
 	err := encoder.Encode(r)
 	if err != nil {
 		return "", fmt.Errorf("error JSON encoding request body: %s", err.Error())
 	}
 
-	// Make request
-	resp, err := http.Post(exchangeGitHubCodeURL, "application/json", bodyBuffer)
+	// Setup request
+	req, err := http.NewRequest(http.MethodPost, exchangeGitHubCodeURL, reqBodyBuffer)
 	if err != nil {
-		return "", fmt.Errorf("error making exchange GitHub API token request: %s", err.Error())
+		return "", fmt.Errorf("error setting up request: %s", err.Error())
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
+
+	// Execute request
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("error GitHub API request: %s", err.Error())
 	}
 
 	// Decode request
 	var ghResp exchangeGitHubCodeResp
 	decoder := json.NewDecoder(resp.Body)
 
-	err = decoder.Decode(ghResp)
+	err = decoder.Decode(&ghResp)
 	if err != nil {
-		return "", fmt.Errorf("error decoding exchange GitHub API response body: %s", err.Error())
+		return "", fmt.Errorf("error decoding GitHub API response body: %s", err.Error())
+	}
+
+	if len(ghResp.Error) > 0 {
+		return "", fmt.Errorf("error returned by GitHub API: %s", ghResp.Error)
 	}
 
 	// Success
