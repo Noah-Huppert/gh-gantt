@@ -13,11 +13,16 @@ module.exports = {
 	mode: "development",
 	devtool: "source-map",
 	entry: [
-		"./src/index.jsx"
+		"./src/index.js"
 	],
 	output: {
 		path: buildDir,
 		filename: "[name].js"
+	},
+	resolve: {
+		alias: {
+			"vue$": "vue/dist/vue.min.js"
+		}
 	},
 	module: {
 		rules: [
