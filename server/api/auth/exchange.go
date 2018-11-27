@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Noah-Huppert/gh-gantt/server/auth"
+	"github.com/Noah-Huppert/gh-gantt/server/auth/github"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
 	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
@@ -60,15 +61,16 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 	}
 
 	// Exchange code
-	exchangeReq := auth.NewExchangeGitHubCodeReq(h.cfg, request.Code, request.State)
+	exchangeReq := github.NewExchangeGitHubCodeReq(h.cfg, request.Code, request.State)
 
-	authToken, err := exchangeReq.Exchange()
+	ghAuthToken, err := exchangeReq.Exchange()
 	if err != nil {
 		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 			"error exchanging code for GitHub access token", err.Error())
 	}
 
-	h.logger.Debugf("authToken: %s", authToken)
+	// Create auth token
+	//authToken := auth.NewAuthToken(h.cfg.ServiceName)
 
 	return resp.NewJSONResponder("ok", http.StatusOK)
 }
