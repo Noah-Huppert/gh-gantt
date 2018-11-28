@@ -1,21 +1,36 @@
 import Vue from "vue"
-import components from "./components"
+import { components, routes } from "./components"
 import Vue2Storage from "vue2-storage"
+import VueRouter from "vue-router"
 
+// Setup Vue App
+// ... Enable developer tools
+Vue.config.devtools = true
+
+// ... Store data in local storage
 Vue.use(Vue2Storage, {
 	prefix: "",
 	driver: "local",
-	ttl: 60 * 60 * 24 * 365 * 100 // 60 seconds in minute -> 60 minutes in hour -> 24 hours in day -> 365 days in year
-	// -> 100 years
+	ttl: 60 * 60 * 24 * 365 * 100 // 100 years
 })
 
+var store = Vue.$storage.get("store", {
+	foo: ""
+})
+
+// ... Single page app router
+Vue.use(VueRouter)
+
+const router = new VueRouter({
+	routes: routes(store)
+})
+
+// ... Initialize
 const app = new Vue({
 	el: "#app",
 	data() {
 		return {
-			store: this.$storage.get("store", {
-				foo: ""
-			})
+			store: store	
 		}
 	},
 	watch: {
@@ -26,5 +41,6 @@ const app = new Vue({
 			deep: true
 		}
 	},
-	components
+	components,
+	router
 })

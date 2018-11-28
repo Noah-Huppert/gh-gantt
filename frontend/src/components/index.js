@@ -1,5 +1,17 @@
 import HelloComponent from "./hello"
 
-export default {
+export const components = {
 	HelloComponent
+}
+
+export const routes = (store) => {
+	return [
+		{ 
+			path: "/",
+			component: HelloComponent,
+			props: {
+				store: store
+			}
+		}
+	]
 }
