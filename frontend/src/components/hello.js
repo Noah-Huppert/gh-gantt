@@ -1,3 +1,6 @@
 export default {
-	template: "<div>Hello World</div>"
+	props: [
+		"store"
+	],
+	template: "<input v-model='store.foo'>"
 }
