@@ -1,7 +1,9 @@
 import Vue from "vue"
-import { components, routes } from "./components"
 import Vue2Storage from "vue2-storage"
 import VueRouter from "vue-router"
+
+import "./sass/styles.sass"
+import { components, routes, LoginPageRoute, LoginCallbackPageRoute } from "./components"
 
 // Setup Vue App
 // ... Enable developer tools
@@ -15,7 +17,7 @@ Vue.use(Vue2Storage, {
 })
 
 var store = Vue.$storage.get("store", {
-	foo: ""
+	authToken: undefined
 })
 
 // ... Single page app router
@@ -31,6 +33,15 @@ const app = new Vue({
 	data() {
 		return {
 			store: store	
+		}
+	},
+	mounted() {
+		// ... Check if logged in
+		if (this.$router.currentRoute.path != LoginCallbackPageRoute && 
+			store.authToken === undefined) {
+
+			// If not logged in
+			router.push(LoginPageRoute)
 		}
 	},
 	watch: {
