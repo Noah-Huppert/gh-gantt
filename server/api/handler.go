@@ -1,6 +1,8 @@
 package api
 
 import (
+	"context"
+
 	"github.com/Noah-Huppert/gh-gantt/server/api/auth"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
@@ -11,6 +13,9 @@ import (
 
 // APIHandlers sets up the handlers for API endpoints
 type APIHandlers struct {
+	// ctx is the application context
+	ctx context.Context
+
 	// logger is used to print debug information in API endpoints
 	logger golog.Logger
 
@@ -19,8 +24,9 @@ type APIHandlers struct {
 }
 
 // NewAPIHandlers creates a new APIHandlers
-func NewAPIHandlers(logger golog.Logger, cfg config.Config) APIHandlers {
+func NewAPIHandlers(ctx context.Context, logger golog.Logger, cfg config.Config) APIHandlers {
 	return APIHandlers{
+		ctx:    ctx,
 		logger: logger,
 		cfg:    cfg,
 	}
@@ -41,6 +47,6 @@ func (a APIHandlers) SetupRouter(router *mux.Router) {
 
 	// ... Exchange
 	authExchangeLogger := authLogger.GetChild("auth.exchange")
-	authExchangeHandler := resp.WrapResponderHandler(auth.NewAuthExchangeHandler(authExchangeLogger, a.cfg))
+	authExchangeHandler := resp.WrapResponderHandler(auth.NewAuthExchangeHandler(a.ctx, authExchangeLogger, a.cfg))
 	router.Handle("/auth/exchange", authExchangeHandler).Methods("POST")
 }

@@ -15,7 +15,7 @@ export const components = {
 
 // Page routes
 export const HomePageRoute = "/"
-export const LoginPageRoute = "/"
+export const LoginPageRoute = "/login"
 export const LoginCallbackPageRoute = "/auth/github"
 
 export const routes = (store) => {

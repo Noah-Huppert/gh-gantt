@@ -40,7 +40,7 @@ func (s Server) Serve() error {
 
 	apiRouter := router.PathPrefix("/api/v0").Subrouter()
 
-	apiHandlers := api.NewAPIHandlers(s.logger, s.cfg)
+	apiHandlers := api.NewAPIHandlers(s.ctx, s.logger, s.cfg)
 	apiHandlers.SetupRouter(apiRouter)
 
 	//router.Handle("/", http.FileServer(http.Dir("../frontend/dist")))

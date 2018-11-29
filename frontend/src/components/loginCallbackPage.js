@@ -1,7 +1,11 @@
+import { HomePageRoute } from "."
+
 export default {
 	props: ["state"],
-	data: {
-		loginOK: true
+	data() {
+		return {
+			loginOK: true
+		}
 	},
 	template: `
 	<div>
@@ -25,20 +29,14 @@ export default {
 			return;
 		}
 
-		// Exchange temporary auth code with server for auth token
-		fetch("/api/v0/auth/exchange", {
-			method: "POST",
-			body: JSON.stringify({
-				state: params.get("state"),
-				code: params.get("code")
-			})
-		})
-			.then(resp => resp.json())
-			.then(resp => {
-				self.state.authToken = resp.auth_token
+		// Exchange temporary auth code with server for auth toke		
+		api.authExchange(state, code)
+			.then(authToken => {
+				self.state.authToken = authToken
+				router.push(HomePageRoute)
 			})
 			.catch(err => {
-				console.error("Failed to exchange temporary GitHub code with API server", err)
+				console.error(err)
 				self.loginOK = false;
 			})
 	}

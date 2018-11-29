@@ -4,9 +4,11 @@ import VueRouter from "vue-router"
 
 import "./sass/styles.sass"
 import { components, routes, LoginPageRoute, LoginCallbackPageRoute } from "./components"
+import API from "./api"
 
 // Setup Vue App
 // ... Enable developer tools
+Vue.config.debug = true
 Vue.config.devtools = true
 
 // ... Store data in local storage
@@ -23,16 +25,19 @@ var store = Vue.$storage.get("store", {
 // ... Single page app router
 Vue.use(VueRouter)
 
-const router = new VueRouter({
+var router = new VueRouter({
 	routes: routes(store)
 })
+
+// ... API client
+window.api = new API()
 
 // ... Initialize
 const app = new Vue({
 	el: "#app",
 	data() {
 		return {
-			store: store	
+			store: store,
 		}
 	},
 	mounted() {
@@ -44,6 +49,11 @@ const app = new Vue({
 			router.push(LoginPageRoute)
 		}
 	},
+	/*
+	errorCaptured (err, vm, info) {
+		console.error(err, vm, info)
+	},
+	*/
 	watch: {
 		store: {
 			handler(newStore) {

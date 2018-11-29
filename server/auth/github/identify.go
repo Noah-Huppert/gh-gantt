@@ -1,7 +1,8 @@
-package auth
+package github
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/google/go-github/github"
@@ -23,5 +24,5 @@ func Identify(ctx context.Context, authToken string) (string, error) {
 		return "", fmt.Errorf("error retrieving user information from GitHub API: %s", err.Error())
 	}
 
-	return strconv.FormatInt(user.ID, 10), nil
+	return strconv.FormatInt(*(user.ID), 10), nil
 }

@@ -12,6 +12,7 @@ const buildDir = path.join(__dirname, "dist")
 // Configuration
 module.exports = {
 	mode: "development",
+	sourceMap: true,
 	devtool: "source-map",
 	entry: [
 		"./src/index.js"

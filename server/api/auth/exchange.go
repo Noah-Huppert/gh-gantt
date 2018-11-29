@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/Noah-Huppert/gh-gantt/server/auth"
@@ -15,6 +16,9 @@ import (
 // AuthExchangeHandler implements resp.ResponderHandler by exchanging a GitHub OAuth temporary code for a longer lived
 // GitHub auth token
 type AuthExchangeHandler struct {
+	// ctx is the context
+	ctx context.Context
+
 	// logger is used to output debug information
 	logger golog.Logger
 
@@ -32,8 +36,9 @@ type AuthExchangeRequest struct {
 }
 
 // NewAuthExchangeHandler creates a new AuthExchangeHandler
-func NewAuthExchangeHandler(logger golog.Logger, cfg config.Config) AuthExchangeHandler {
+func NewAuthExchangeHandler(ctx context.Context, logger golog.Logger, cfg config.Config) AuthExchangeHandler {
 	return AuthExchangeHandler{
+		ctx:    ctx,
 		logger: logger,
 		cfg:    cfg,
 	}
@@ -69,8 +74,23 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 			"error exchanging code for GitHub access token", err.Error())
 	}
 
-	// Create auth token
-	//authToken := auth.NewAuthToken(h.cfg.ServiceName)
+	// Identify GitHub user
+	ghUserID, err := github.Identify(h.ctx, ghAuthToken)
+	if err != nil {
+		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
+			"error identifying user", err.Error())
+	}
 
-	return resp.NewJSONResponder("ok", http.StatusOK)
+	// Create auth token
+	authToken := auth.NewAuthToken(h.cfg.ServiceName, ghUserID, ghAuthToken)
+
+	authTokenStr, err := authToken.Encode(h.cfg.SigningSecret)
+	if err != nil {
+		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
+			"error encoding authentication token", err.Error())
+	}
+
+	return resp.NewJSONResponder(map[string]interface{}{
+		"auth_token": authTokenStr,
+	}, http.StatusOK)
 }
