@@ -1,12 +1,13 @@
-var path = require("path");
+var path = require("path")
 
-var webpack = require("webpack");
+var webpack = require("webpack")
 
-var CleanWebpackPlugin = require("clean-webpack-plugin");
-var HtmlWebpackPlugin = require("html-webpack-plugin");
+const CleanWebpackPlugin = require("clean-webpack-plugin")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
 
 // Constants
-const buildDir = path.join(__dirname, "dist");
+const buildDir = path.join(__dirname, "dist")
 
 // Configuration
 module.exports = {
@@ -36,8 +37,15 @@ module.exports = {
 				}
 			},
 			{
-				test: /\.scss/,
-				use: ["style-loader", "css-loader", "sass-loader"]
+				test: /\.s(a|c)ss/,
+				use: ExtractTextPlugin.extract({
+					fallback: "style-loader",
+					use: ["css-loader", "sass-loader"]
+				})
+			},
+			{
+				test: /\.(woff|woff2|eot|ttf|svg)$/,
+				loader: ["file-loader"]
 			}
 		]
 	},
@@ -49,6 +57,7 @@ module.exports = {
 				viewport: "width=device-with, initial-scale=1"
 			},
 			template: "src/index.html"
-		})
+		}),
+		new ExtractTextPlugin("css/styles.css")
 	]
-};
+}
