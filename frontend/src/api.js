@@ -21,15 +21,15 @@ export default class API {
 
 		return fetch(url, reqOpts)
 			.then(resp => {
-				return Promise.resolve([resp, resp.json()])
+				return resp.json()
+					.then(body => {
+						return Promise.resolve([resp, body])
+					})
 			})
 			.catch(err => {
 				return Promise.reject("error decoding response body into JSON: " + err)
 			})
-			.then((promItems) => {
-				var resp = promItems[0]
-				var body = promItems[1]
-
+			.then(([resp, body]) => {
 				// Check response code
 				if (resp.status != 200) {
 					console.log("NOT 200", body)

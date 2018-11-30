@@ -12,7 +12,8 @@ const buildDir = path.join(__dirname, "dist")
 // Configuration
 module.exports = {
 	mode: "development",
-	devtool: "source-map",
+	devtool: "inline-source-map",
+	//devtool: "source-map",
 	entry: [
 		"./src/index.js"
 	],
@@ -23,8 +24,8 @@ module.exports = {
 	resolve: {
 		alias: {
 			"vue$": "vue/dist/vue.js",
-			//			"vue-router$": "vue-router/dist/vue-router.js"
-		}
+			//"vue-router$": "vue-router/dist/vue-router.js"
+		},
 	},
 	module: {
 		rules: [
