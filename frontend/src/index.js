@@ -25,7 +25,7 @@ var store = Vue.$storage.get("store", {
 // ... Single page app router
 Vue.use(VueRouter)
 
-var router = new VueRouter({
+window.router = new VueRouter({
 	routes: routes(store)
 })
 
@@ -49,11 +49,6 @@ const app = new Vue({
 			router.push(LoginPageRoute)
 		}
 	},
-	/*
-	errorCaptured (err, vm, info) {
-		console.error(err, vm, info)
-	},
-	*/
 	watch: {
 		store: {
 			handler(newStore) {

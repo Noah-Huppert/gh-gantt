@@ -1,7 +1,7 @@
 import { HomePageRoute } from "."
 
 export default {
-	props: ["state"],
+	props: ["store"],
 	data() {
 		return {
 			loginOK: true
@@ -29,10 +29,13 @@ export default {
 			return;
 		}
 
+		const state = params.get("state") 
+		const code = params.get("code")
+
 		// Exchange temporary auth code with server for auth toke		
 		api.authExchange(state, code)
 			.then(authToken => {
-				self.state.authToken = authToken
+				self.store.authToken = authToken
 				router.push(HomePageRoute)
 			})
 			.catch(err => {

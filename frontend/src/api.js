@@ -11,7 +11,7 @@ export default class API {
 	 * @returns {Promise} Resolves with response body object, rejects with an error string
 	 */
 	makeRequest(url, method, body) {
-		reqOpts = {
+		var reqOpts = {
 			method: method,
 		}
 
@@ -21,19 +21,23 @@ export default class API {
 
 		return fetch(url, reqOpts)
 			.then(resp => {
-				return Promise.resolve(resp, resp.json())
+				return Promise.resolve([resp, resp.json()])
 			})
 			.catch(err => {
 				return Promise.reject("error decoding response body into JSON: " + err)
 			})
-			.then((resp, body) => {
+			.then((promItems) => {
+				var resp = promItems[0]
+				var body = promItems[1]
+
 				// Check response code
 				if (resp.status != 200) {
+					console.log("NOT 200", body)
 					return Promise.reject("error returned by API: " + body.error)
 				}
 
 				// Success
-				return Promise.resolve(body)
+				return Promise.resolve(body.auth_token)
 			})
 	}
 
@@ -45,14 +49,14 @@ export default class API {
 	 */
 	authExchange(state, code) {
 		return this.makeRequest("/api/v0/auth/exchange", "POST", {
-			state: params.get("state"),
-			code: params.get("code")
+			state: state,
+			code: code
 		})
 			.then(body => {
 				return Promise.resolve(body.auth_token)
 			})
 			.catch(err => {
-				return Promise.resolve("error exchanging temporary authentication code with API: " + err)
+				return Promise.reject("error exchanging temporary authentication code with API: " + err)
 			})
 	}
 }
