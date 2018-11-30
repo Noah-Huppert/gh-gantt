@@ -7,7 +7,7 @@ GH Gantt frontend.
 - [Build](#build)
 
 # Overview
-GH Gantt frontend ReactJs single page web app.
+GH Gantt frontend VueJS single page web app.
 
 # Dependencies
 Install dependencies with [NPM](https://www.npmjs.com/):
