@@ -20,11 +20,14 @@ func MakeState(stateSigningPrivKey []byte) string {
 	stateBytes := make([]byte, RawStateBytesLen)
 	rand.Read(stateBytes)
 
+	// Replace dots with dashes, since dots are used to separate the state and the state signature
+	stateStr := strings.Replace(string(stateBytes), ".", "-", -1)
+
 	// Sign raw bytes
 	stateSignature := ed25519.Sign(stateSigningPrivKey, stateBytes)
 
 	// Format
-	formattedState := fmt.Sprintf("%s.%s", stateBytes, stateSignature)
+	formattedState := fmt.Sprintf("%s.%s", stateStr, stateSignature)
 
 	// Base64 encode
 	return base64.StdEncoding.EncodeToString([]byte(formattedState))
