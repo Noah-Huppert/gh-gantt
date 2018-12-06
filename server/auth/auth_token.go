@@ -104,5 +104,11 @@ func (t *AuthToken) Decode(tokenStr, signingSecret string) error {
 		return fmt.Errorf("missing claims: %s", strings.Join(missingClaims, ", "))
 	}
 
+	t.Issuer = claims["iss"].(string)
+	t.Audience = claims["aud"].(string)
+	t.GitHubUserID = claims["sub"].(string)
+	t.GitHubAuthToken = claims["github_auth_token"].(string)
+	t.ZenHubAuthToken = claims["zenhub_auth_token"].(string)
+
 	return nil
 }

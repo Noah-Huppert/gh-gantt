@@ -54,4 +54,9 @@ func (a APIHandlers) SetupRouter(router *mux.Router) {
 	authZenHubAppendLogger := authLogger.GetChild("zenhub.append")
 	authZenHubAppendHandler := resp.WrapResponderHandler(auth.NewZenHubAppendHandler(authZenHubAppendLogger, a.cfg))
 	router.Handle("/auth/zenhub", authZenHubAppendHandler).Methods("POST")
+
+	// Issues
+	issuesLogger := a.logger.GetChild("issues")
+	issuesHandler := resp.WrapResponderHandler(NewIssuesHandler(a.ctx, issuesLogger, a.cfg))
+	router.Handle("/issues", issuesHandler).Methods("GET")
 }

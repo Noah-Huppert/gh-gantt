@@ -14,7 +14,6 @@ export default new Vuex.Store({
 	},
 	mutations: {
 		authToken(state, authToken) {
-			console.log("commit.authToken", state, authToken)
 			state.authToken = authToken
 		}
 	},
