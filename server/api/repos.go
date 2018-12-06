@@ -3,13 +3,15 @@ package api
 import (
 	"context"
 	"net/http"
+	"strings"
 
-	"github.com/Noah-Huppert/gh-gantt/server/auth/github"
+	libgithub "github.com/Noah-Huppert/gh-gantt/server/auth/github"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
 	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
 	"github.com/Noah-Huppert/golog"
+	"github.com/google/go-github/github"
 )
 
 // ReposHandler implements resp.ResponderHandler by returning a list of GitHub repository names for a user
@@ -42,9 +44,15 @@ func (h ReposHandler) Handle(r *http.Request) resp.Responder {
 	}
 
 	// Get GitHub repos
-	client := github.NewUserClient(h.ctx, authToken.GitHubAuthToken)
+	client := libgithub.NewUserClient(h.ctx, authToken.GitHubAuthToken)
 
-	repos, _, err := client.Repositories.ListAll(h.ctx, nil)
+	// TODO: Get paginated results so all repos will be returned
+	// TODO: Get all orgs user belongs to and call list for each
+	repos, _, err := client.Repositories.List(h.ctx, "", &github.RepositoryListOptions{
+		ListOptions: github.ListOptions{
+			PerPage: 999,
+		},
+	})
 	if err != nil {
 		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 			"error retrieving repositories from GitHub API", err.Error())
@@ -54,15 +62,18 @@ func (h ReposHandler) Handle(r *http.Request) resp.Responder {
 	reposResp := map[string][]string{}
 
 	for _, repo := range repos {
-		// Check if org exists in resp
-		org := *(repo.Organization.Login)
+		// Check if owner exists in resp
+		nameParts := strings.Split(*(repo.FullName), "/")
 
-		if _, ok := reposResp[org]; !ok {
-			reposResp[org] = []string{}
+		owner := nameParts[0]
+		name := nameParts[1]
+
+		if _, ok := reposResp[owner]; !ok {
+			reposResp[owner] = []string{}
 		}
 
 		// Add to resp
-		reposResp[org] = append(reposResp[org], *(repo.Name))
+		reposResp[owner] = append(reposResp[owner], name)
 	}
 
 	return resp.NewJSONResponder(map[string]interface{}{
