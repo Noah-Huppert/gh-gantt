@@ -1,3 +1,5 @@
 export default {
-	template: "<div>Home Page</div>"
+	template: `
+	<div>Home Page</div>
+	`
 }
