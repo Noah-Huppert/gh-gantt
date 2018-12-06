@@ -8,7 +8,6 @@ import (
 	"github.com/Noah-Huppert/gh-gantt/server/auth"
 	"github.com/Noah-Huppert/gh-gantt/server/auth/github"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
-	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
 	"github.com/Noah-Huppert/golog"
@@ -70,13 +69,24 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 			"error parsing provided API authentication token", err.Error())
 	}
 
-	// Decode body
+	// Get query parameters
+	// TODO: Make helper
 	var request IssuesRequest
 
-	errResp := req.DecodeValidatedJSON(h.logger, r, &request)
-	if errResp != nil {
-		return errResp
+	repoOwner := r.URL.Query().Get("repository_owner")
+	if len(repoOwner) == 0 {
+		return resp.NewStrErrorResponder(h.logger, http.StatusBadRequest,
+			"repository_owner query parameter must be provided", "")
 	}
+
+	repoName := r.URL.Query().Get("repository_name")
+	if len(repoOwner) == 0 {
+		return resp.NewStrErrorResponder(h.logger, http.StatusBadRequest,
+			"repository_name query parameter must be provided", "")
+	}
+
+	request.RepositoryOwner = repoOwner
+	request.RepositoryName = repoName
 
 	// Get GitHub issues
 	client := github.NewUserClient(h.ctx, authToken.GitHubAuthToken)
