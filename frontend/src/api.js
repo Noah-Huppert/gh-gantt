@@ -2,7 +2,6 @@
  * API Client
  */
 export default class API {
-	// TODO: Write check resp helper for all api resp
 	/**
 	 * Make an API request
 	 * @param {string} url - URL to make API request to
