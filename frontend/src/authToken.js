@@ -4,7 +4,7 @@
  * @throws {string} If an error occurs while parsing the JWT
  * @returns {object} JWT claims
  */
-function parseAuthToken(authTokenStr) {
+export function parseAuthToken(authTokenStr) {
 	// Check in correct format
 	let parts = authTokenStr.split(".")
 

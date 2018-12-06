@@ -1,22 +1,24 @@
 import AppHeader from "./appHeader"
 
 import HomePage from "./homePage"
-import LoginPage from "./loginPage"
-import LoginCallbackPage from "./loginCallbackPage"
+import GHLoginPage from "./ghLoginPage"
+import GHLoginCallbackPage from "./ghLoginCallbackPage"
+import ZenHubLoginPage from "./zenhubLoginPage"
 
 // All components which can be used in Vue templates
 export const components = {
 	AppHeader,
 
 	HomePage,
-	LoginPage,
-	LoginCallbackPage
+	GHLoginPage,
+	GHLoginCallbackPage
 }
 
 // Page routes
 export const HomePageRoute = "/"
-export const LoginPageRoute = "/login"
-export const LoginCallbackPageRoute = "/auth/github"
+export const GHLoginPageRoute = "/auth/github"
+export const GHLoginCallbackPageRoute = "/auth/github_callback"
+export const ZenHubLoginPageRoute = "/auth/zenhub"
 
 export const routes = [
 	{
@@ -24,11 +26,15 @@ export const routes = [
 		component: HomePage
 	},
 	{ 
-		path: LoginPageRoute,
-		component: LoginPage,
+		path: GHLoginPageRoute,
+		component: GHLoginPage
 	},
 	{
-		path: LoginCallbackPageRoute,
-		component: LoginCallbackPage,
+		path: GHLoginCallbackPageRoute,
+		component: GHLoginCallbackPage
+	},
+	{
+		path: ZenHubLoginPageRoute,
+		component: ZenHubLoginPage
 	}
 ]
