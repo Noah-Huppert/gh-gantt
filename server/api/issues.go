@@ -3,11 +3,10 @@ package api
 import (
 	"context"
 	"net/http"
-	"strings"
 
-	"github.com/Noah-Huppert/gh-gantt/server/auth"
 	"github.com/Noah-Huppert/gh-gantt/server/auth/github"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
 	"github.com/Noah-Huppert/golog"
@@ -46,27 +45,9 @@ func NewIssuesHandler(ctx context.Context, logger golog.Logger, cfg config.Confi
 // Handle implements resp.ResponderHandler.Handle
 func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 	// Check auth token
-	// TODO: Turn into middleware
-	authorization := r.Header.Get("Authorization")
-	if len(authorization) == 0 {
-		return resp.NewStrErrorResponder(h.logger, http.StatusUnauthorized,
-			"no authentication token provided", "authorization header empty")
-	}
-
-	authorizationParts := strings.Split(authorization, " ")
-	if len(authorizationParts) != 2 {
-		return resp.NewStrErrorResponder(h.logger, http.StatusUnauthorized,
-			"authorization header not in correct format, must be: token <TOKEN>", "")
-	}
-
-	authTokenStr := authorizationParts[1]
-
-	authToken := &auth.AuthToken{}
-	err := authToken.Decode(authTokenStr, h.cfg.SigningSecret)
-
-	if err != nil {
-		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
-			"error parsing provided API authentication token", err.Error())
+	authToken, errResp := req.CheckAuthToken(h.logger, h.cfg, r)
+	if errResp != nil {
+		return errResp
 	}
 
 	// Get query parameters
