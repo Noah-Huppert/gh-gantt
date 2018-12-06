@@ -42,6 +42,7 @@ func (t AuthToken) claims() map[string]interface{} {
 	}
 }
 
+// Encode an auth token into a string
 func (t AuthToken) Encode(signingSecret string) (string, error) {
 	// Generate claims
 	var claims jwt.MapClaims = t.claims()
