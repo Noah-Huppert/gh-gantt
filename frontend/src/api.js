@@ -57,4 +57,23 @@ export default class API {
 				return Promise.reject("error exchanging temporary authentication code with API: " + err)
 			})
 	}
+
+	/**
+	 * Sends a ZenHub authentication token to the server to be appended to an existing authentication token
+	 * @param {string} authToken - Existing API authentication token
+	 * @param {string} zenhubAuthToken - ZenHub authentication token
+	 * @returns {Promise} Resolves with new API authentication token, rejects with error string
+	 */
+	authZenHubAppend(authToken, zenhubAuthToken) {
+		return this.makeRequest("/api/v0/auth/zenhub", "POST", {
+			auth_token: authToken,
+			zenhub_auth_token: zenhubAuthToken
+		})
+			.then(body => {
+				return Promise.resolve(body.auth_token)
+			})
+			.catch(err => {
+				return Promise.reject("error appending ZenHub authentication token: " + err)
+			})
+	}
 }

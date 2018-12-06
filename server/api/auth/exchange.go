@@ -26,7 +26,7 @@ type AuthExchangeHandler struct {
 	cfg config.Config
 }
 
-// AuthExchangeRequest is the format an auth exchange request
+// AuthExchangeRequest is the format for an auth exchange request
 type AuthExchangeRequest struct {
 	// State is the state parameter returned in the GitHub redirect, used to prevent cross site forgery
 	State string `json:"state" validate:"nonzero"`
@@ -82,7 +82,7 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 	}
 
 	// Create auth token
-	authToken := auth.NewAuthToken(h.cfg.ServiceName, ghUserID, ghAuthToken)
+	authToken := auth.NewAuthToken(h.cfg.ServiceName, ghUserID, ghAuthToken, "")
 
 	authTokenStr, err := authToken.Encode(h.cfg.SigningSecret)
 	if err != nil {

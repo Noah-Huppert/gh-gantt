@@ -21,16 +21,20 @@ type AuthToken struct {
 
 	// GitHubAuthToken is the user's GitHub authentication token
 	GitHubAuthToken string `json:"github_auth_token"`
+
+	// ZenHubAuthToken is the user's ZenHub authentication token
+	ZenHubAuthToken string `json:"zenhub_auth_token"`
 }
 
 // NewAuthToken creates a new AuthToken.
 // The serviceName is used for the Issuer and Audience field
-func NewAuthToken(serviceName, ghUserID, ghAuthToken string) AuthToken {
+func NewAuthToken(serviceName, ghUserID, ghAuthToken, zhAuthToken string) AuthToken {
 	return AuthToken{
 		Issuer:          serviceName,
 		Audience:        serviceName,
 		GitHubUserID:    ghUserID,
 		GitHubAuthToken: ghAuthToken,
+		ZenHubAuthToken: zhAuthToken,
 	}
 }
 
@@ -41,6 +45,7 @@ func (t AuthToken) claims() map[string]interface{} {
 		"aud":               t.Audience,
 		"sub":               t.GitHubUserID,
 		"github_auth_token": t.GitHubAuthToken,
+		"zenhub_auth_token": t.ZenHubAuthToken,
 	}
 }
 
@@ -69,7 +74,7 @@ func (t *AuthToken) Decode(tokenStr, signingSecret string) error {
 			return nil, fmt.Errorf("signing method must be HS256, was: %s", token.Header["alg"])
 		}
 
-		return signingSecret, nil
+		return []byte(signingSecret), nil
 	})
 
 	if err != nil {
@@ -86,7 +91,7 @@ func (t *AuthToken) Decode(tokenStr, signingSecret string) error {
 		return errors.New("failed to convert claims to map")
 	}
 
-	requiredClaims := []string{"iss", "aud", "sub", "github_auth_token"}
+	requiredClaims := []string{"iss", "aud", "sub", "github_auth_token", "zenhub_auth_token"}
 	missingClaims := []string{}
 
 	for _, claimKey := range requiredClaims {

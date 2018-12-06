@@ -38,7 +38,7 @@ const app = new Vue({
 
 			// If not logged into GitHub redirect to GitHub login page
 			router.push(GHLoginPageRoute)
-		} else if (!("zenhub_auth_token" in parseAuthToken(this.authToken))) { // Check if logged into ZenHub
+		} else if (this.$router.currenRoute != ZenHubLoginPageRoute && parseAuthToken(this.authToken).zenhub_auth_token.length == 0) { // Check if logged into ZenHub
 			router.push(ZenHubLoginPageRoute)
 		}
 
