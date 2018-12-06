@@ -59,4 +59,9 @@ func (a APIHandlers) SetupRouter(router *mux.Router) {
 	issuesLogger := a.logger.GetChild("issues")
 	issuesHandler := resp.WrapResponderHandler(NewIssuesHandler(a.ctx, issuesLogger, a.cfg))
 	router.Handle("/issues", issuesHandler).Methods("GET")
+
+	// Repositories
+	reposLogger := a.logger.GetChild("repos")
+	reposHandler := resp.WrapResponderHandler(NewReposHandler(a.ctx, reposLogger, a.cfg))
+	router.Handle("/repositories", reposHandler).Methods("GET")
 }
