@@ -118,4 +118,20 @@ export default class API {
 				return Promise.reject("error retrieving GitHub issues from API: " + err)
 			})
 	}
+
+	/**
+	 * Retrieves a list of GitHub repositories
+	 * @param {string} authToken - API authentication token
+	 * @returns {Promise} Resolves with object containing repositories. Keys are organizations. Values are arrays of 
+	 * repository names. Rejects with an error string
+	 */
+	getRepositories(authToken) {
+		return this.makeRequest("/api/v0/repositories", "GET", authToken, undefined, undefined)
+			.then(body => {
+				return Promise.resolve(body.repositories)
+			})
+			.catch(err => {
+				return Promise.reject("error retrieving GitHub repositories from API: " + err)
+			})
+	}
 }

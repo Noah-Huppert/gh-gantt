@@ -3,8 +3,10 @@ import { mapState } from "vuex"
 
 import { parseAuthToken } from "../authToken"
 import { GHLoginPageRoute, GHLoginCallbackPageRoute, ZenHubLoginPageRoute } from "."
+import RepoSelector from "./repoSelector"
 
 export default {
+	name: "home-page",
 	data() {
 		return {
 			showGantt: false,
@@ -26,9 +28,13 @@ export default {
 			return {}
 		}
 	}),
+	components: {
+		RepoSelector
+	},
 	template: `
 	<div>
 		<div v-if="showGantt">
+			<repo-selector></repo-selector>
 			<div id="chart"></div>
 		</div>
 

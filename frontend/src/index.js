@@ -4,7 +4,8 @@ import { mapState } from "vuex"
 import VueRouter from "vue-router"
 
 import "./sass/styles.sass"
-import { components, routes } from "./components"
+import { routes} from "./components"
+import AppHeader from "./components/appHeader"
 import API from "./api"
 import store from "./store"
 
@@ -40,7 +41,9 @@ const app = new Vue({
 	mounted() {
 		
 	},
-	components,
+	components: {
+		AppHeader
+	},
 	router,
 	store
 })

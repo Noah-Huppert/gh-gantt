@@ -1,4 +1,5 @@
 export default {
+	name: "app-header",
 	template: `
 	<nav class="navbar is-primary">
 		<div class="navbar-brand">

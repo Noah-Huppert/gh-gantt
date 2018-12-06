@@ -1,4 +1,5 @@
 export default {
+	name: "gh-login-page",
 	template: `
 	<div>
 		<div class="container">
