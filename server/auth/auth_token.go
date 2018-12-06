@@ -74,7 +74,7 @@ func (t *AuthToken) Decode(tokenStr, signingSecret string) error {
 			return nil, fmt.Errorf("signing method must be HS256, was: %s", token.Header["alg"])
 		}
 
-		return signingSecret, nil
+		return []byte(signingSecret), nil
 	})
 
 	if err != nil {
