@@ -54,29 +54,58 @@ export default {
 					self.issues = issues
 					self.showGantt = true
 
-					GoogleCharts.load(() => {
-						var rows = [["Issue Number", "Issue Name", "Start Date", "Completion"]]
-
-						for (var i in this.issues) {
-							var issue = this.issues[i]
-							rows.push([
-								issue.number + "",
-								issue.title,
-								new Date(issue.created_at),
-								0.5
-							])
-						}
-
-						const data = GoogleCharts.api.visualization.arrayToDataTable(rows)
-
-						const chart = new GoogleCharts.api.visualization.Gantt(document.getElementById("chart"))
-						chart.draw(data)
-						console.log("draw")
-					}, {"packages": ["gantt"]})
+					GoogleCharts.load(self.drawChart, {"packages": ["gantt"]})
 				})
 				.catch(err => {
 					console.error(err)
 				})
+		}
+	},
+	methods: {
+		drawChart() {
+			// Data format
+			// https://developers.google.com/chart/interactive/docs/gallery/ganttchart#data-format
+			var rows = [[
+				{ label: "Issue Number", type: "string" },
+				{ label: "Issue Name", type: "string" },
+				{ label: "Start Date", type: "date" },
+				{ label: "End Date", type: "date" },
+				{ label: "Duration", type: "number" },
+				{ label: "Completion", type: "number" },
+				{ label: "Dependencies", type: "string" }
+			]]
+
+			for (var i in this.issues) {
+				var issue = this.issues[i]
+
+				var start = new Date(issue.created_at)
+
+				var end = new Date(issue.created_at)
+				end.setDate(end.getDate()+1)
+
+				rows.push([
+					issue.number.toString(), // Issue Number
+					issue.title, // Issue Name
+					start, // Start Date
+					end, // End Date
+					24 * 60 * 60 * 1000, // Duration
+					0, // Completion
+					null, // Dependencies
+				])
+			}
+
+			const data = GoogleCharts.api.visualization.arrayToDataTable(rows)
+
+			const chart = new GoogleCharts.api.visualization.Gantt(document.getElementById("chart"))
+			const options = {
+				height: 400
+			}
+
+			GoogleCharts.api.visualization.events.addListener(chart, "error", (err) => {
+				console.error("Gantt Chart error", err)
+			})
+
+			chart.draw(data, options)
 		}
 	}
 }
