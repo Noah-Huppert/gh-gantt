@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/base64"
-	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -24,7 +23,7 @@ func MakeState(stateSigningPrivKey []byte) string {
 	stateStr := strings.Replace(string(stateBytes), ".", "-", -1)
 
 	// Sign raw bytes
-	stateSignature := ed25519.Sign(stateSigningPrivKey, stateBytes)
+	stateSignature := ed25519.Sign(stateSigningPrivKey, []byte(stateStr))
 
 	// Format
 	formattedState := fmt.Sprintf("%s.%s", stateStr, stateSignature)
@@ -45,12 +44,12 @@ func VerifyState(stateSigningPubKey []byte, state string) (bool, error) {
 	// Separate state parts
 	parts := strings.Split(string(b64DecodedState), ".")
 
-	if len(parts) != 2 {
-		return false, errors.New("state not in format: <state>.<state signature>")
+	if len(parts) < 2 {
+		return false, fmt.Errorf("state not in format: <state>.<state signature>, was: %s", string(b64DecodedState))
 	}
 
 	stateBytes := []byte(parts[0])
-	stateSignature := []byte(parts[1])
+	stateSignature := []byte(strings.Join(parts[1:], "."))
 
 	return ed25519.Verify([]byte(stateSigningPubKey), stateBytes, stateSignature), nil
 }

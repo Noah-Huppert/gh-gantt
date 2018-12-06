@@ -62,7 +62,7 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 	}
 
 	if !stateValid {
-		return resp.NewStrErrorResponder(h.logger, http.StatusBadRequest, "invalid state", "stateValud=false")
+		return resp.NewStrErrorResponder(h.logger, http.StatusBadRequest, "invalid state", "stateValid=false")
 	}
 
 	// Exchange code
