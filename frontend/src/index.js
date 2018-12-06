@@ -4,9 +4,10 @@ import { mapState } from "vuex"
 import VueRouter from "vue-router"
 
 import "./sass/styles.sass"
-import { components, routes, LoginPageRoute, LoginCallbackPageRoute } from "./components"
+import { components, routes, GHLoginPageRoute, GHLoginCallbackPageRoute } from "./components"
 import API from "./api"
 import store from "./store"
+import { parseAuthToken } from "./authToken"
 
 // Setup Vue App
 // ... Enable developer tools
@@ -32,12 +33,16 @@ const app = new Vue({
 		"authToken"
 	]),
 	mounted() {
-		// ... Check if logged in
-		if (this.$router.currentRoute.path != LoginCallbackPageRoute && this.authToken === undefined) {
+		// Check if logged into GitHub
+		if (this.$router.currentRoute.path != GHLoginCallbackPageRoute && this.authToken === undefined) {
 
-			// If not logged in
-			router.push(LoginPageRoute)
+			// If not logged into GitHub redirect to GitHub login page
+			router.push(GHLoginPageRoute)
+		} else if (!("zenhub_auth_token" in parseAuthToken(this.authToken))) { // Check if logged into ZenHub
+			console.log("not logged into ZenHub")
 		}
+
+		//console.log(parseAuthToken(this.authToken))
 	},
 	components,
 	router,
