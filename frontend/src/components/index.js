@@ -18,25 +18,17 @@ export const HomePageRoute = "/"
 export const LoginPageRoute = "/login"
 export const LoginCallbackPageRoute = "/auth/github"
 
-export const routes = (store) => {
-	return [
-		{
-			path: HomePageRoute,
-			component: HomePage
-		},
-		{ 
-			path: LoginPageRoute,
-			component: LoginPage,
-			props: {
-				store: store
-			}
-		},
-		{
-			path: LoginCallbackPageRoute,
-			component: LoginCallbackPage,
-			props: {
-				store: store
-			}
-		}
-	]
-}
+export const routes = [
+	{
+		path: HomePageRoute,
+		component: HomePage
+	},
+	{ 
+		path: LoginPageRoute,
+		component: LoginPage,
+	},
+	{
+		path: LoginCallbackPageRoute,
+		component: LoginCallbackPage,
+	}
+]

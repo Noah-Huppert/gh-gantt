@@ -1,12 +1,16 @@
+import { mapState } from "vuex"
+
 import { HomePageRoute } from "."
 
 export default {
-	props: ["store"],
 	data() {
 		return {
 			loginOK: true
 		}
 	},
+	computed: mapState([
+		"authToken"
+	]),
 	template: `
 	<div>
 		<div class="container">
@@ -35,11 +39,14 @@ export default {
 		// Exchange temporary auth code with server for auth toke		
 		api.authExchange(state, code)
 			.then(authToken => {
-				self.store.authToken = authToken
+				self.$store.commit("authToken", authToken)
+
 				router.push(HomePageRoute)
+				window.location.search = ""
 			})
 			.catch(err => {
 				console.error(err)
+
 				self.loginOK = false;
 			})
 	}

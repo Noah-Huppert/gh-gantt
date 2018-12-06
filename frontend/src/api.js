@@ -32,12 +32,11 @@ export default class API {
 			.then(([resp, body]) => {
 				// Check response code
 				if (resp.status != 200) {
-					console.log("NOT 200", body)
 					return Promise.reject("error returned by API: " + body.error)
 				}
 
 				// Success
-				return Promise.resolve(body.auth_token)
+				return Promise.resolve(body)
 			})
 	}
 

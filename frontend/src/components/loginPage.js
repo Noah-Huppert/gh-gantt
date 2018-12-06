@@ -1,7 +1,4 @@
 export default {
-	props: [
-		"store"
-	],
 	template: `
 	<div>
 		<div class="container">
