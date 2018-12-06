@@ -41,12 +41,17 @@ func (a APIHandlers) SetupRouter(router *mux.Router) {
 	authLogger := a.logger.GetChild("auth")
 
 	// ... Login
-	authLoginLogger := authLogger.GetChild("auth.login")
+	authLoginLogger := authLogger.GetChild("login")
 	authLoginHandler := resp.WrapResponderHandler(auth.NewAuthLoginHandler(authLoginLogger, a.cfg))
 	router.Handle("/auth/login", authLoginHandler).Methods("GET")
 
 	// ... Exchange
-	authExchangeLogger := authLogger.GetChild("auth.exchange")
+	authExchangeLogger := authLogger.GetChild("exchange")
 	authExchangeHandler := resp.WrapResponderHandler(auth.NewAuthExchangeHandler(a.ctx, authExchangeLogger, a.cfg))
 	router.Handle("/auth/exchange", authExchangeHandler).Methods("POST")
+
+	// ... ZenHub Append
+	authZenHubAppendLogger := authLogger.GetChild("zenhub.append")
+	authZenHubAppendHandler := resp.WrapResponderHandler(auth.NewZenHubAppendHandler(authZenHubAppendLogger, a.cfg))
+	router.Handle("/auth/zenhub", authZenHubAppendHandler).Methods("POST")
 }
