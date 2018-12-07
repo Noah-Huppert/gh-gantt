@@ -160,7 +160,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 		}
 
 		// Make ZenHub issue dependencies API request
-		depsRespURL, err := url.Parse(fmt.Sprintf("https://api.zenhub.io/p1/repositories/%d/dependencies", repo.ID))
+		depsReqURL, err := url.Parse(fmt.Sprintf("https://api.zenhub.io/p1/repositories/%d/dependencies", *(repo.ID)))
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 				"error setting up ZenHub dependencies API request",
@@ -170,7 +170,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 
 		depsReq := &http.Request{
 			Method: http.MethodGet,
-			URL:    depsRespURL,
+			URL:    depsReqURL,
 			Header: map[string][]string{
 				"X-Authentication-Token": []string{authToken.ZenHubAuthToken},
 			},
@@ -182,6 +182,14 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 				"error retrieving issue dependencies from ZenHub API", err.Error())
 			return
+		}
+
+		if depsResp.StatusCode != http.StatusOK {
+			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
+				"error retrieving issue dependencies from ZenHub API",
+				fmt.Sprintf("status not OK: %s", depsResp.Status))
+			return
+
 		}
 
 		// Decode ZenHub issue dependencies API response
@@ -247,6 +255,13 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 			ci.Dependencies = append(ci.Dependencies, dep.Blocking.IssueNumber)
 
 			issuesResp[number] = ci
+		}
+	}
+
+	// Trim empty issues
+	for number, issue := range issuesResp {
+		if len(issue.Title) == 0 {
+			delete(issuesResp, number)
 		}
 	}
 
