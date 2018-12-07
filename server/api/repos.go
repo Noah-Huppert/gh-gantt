@@ -43,37 +43,65 @@ func (h ReposHandler) Handle(r *http.Request) resp.Responder {
 		return errResp
 	}
 
-	// Get GitHub repos
 	client := libgithub.NewUserClient(h.ctx, authToken.GitHubAuthToken)
-
-	// TODO: Get paginated results so all repos will be returned
-	// TODO: Get all orgs user belongs to and call list for each
-	repos, _, err := client.Repositories.List(h.ctx, "", &github.RepositoryListOptions{
-		ListOptions: github.ListOptions{
-			PerPage: 999,
-		},
-	})
-	if err != nil {
-		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
-			"error retrieving repositories from GitHub API", err.Error())
-	}
 
 	// Group repositories for response
 	reposResp := map[string][]string{}
 
-	for _, repo := range repos {
-		// Check if owner exists in resp
-		nameParts := strings.Split(*(repo.FullName), "/")
+	// Get organizations
+	repoOwners := []string{""}
 
-		owner := nameParts[0]
-		name := nameParts[1]
+	orgs, _, err := client.Organizations.List(h.ctx, "", nil)
 
-		if _, ok := reposResp[owner]; !ok {
-			reposResp[owner] = []string{}
+	if err != nil {
+		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
+			"error retrieving user's organizations from GitHub API", err.Error())
+	}
+
+	for _, org := range orgs {
+		repoOwners = append(repoOwners, *(org.Login))
+	}
+
+	// For each organization get repos
+	for _, repoOwner := range repoOwners {
+		nextPage := 1
+
+		// Get all repositories, requires a paginated API request to GitHub
+		for nextPage > 0 {
+			// Setup request
+			listOpts := &github.RepositoryListOptions{
+				ListOptions: github.ListOptions{
+					PerPage: 100,
+					Page:    nextPage,
+				},
+			}
+
+			repos, apiResp, err := client.Repositories.List(h.ctx, repoOwner, listOpts)
+
+			if err != nil {
+				return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
+					"error retrieving repositories from GitHub API", err.Error())
+			}
+
+			// Setup next page of API request
+			nextPage = apiResp.NextPage
+
+			// Add repos to response
+			for _, repo := range repos {
+				// Check if owner exists in resp
+				nameParts := strings.Split(*(repo.FullName), "/")
+
+				owner := nameParts[0]
+				name := nameParts[1]
+
+				if _, ok := reposResp[owner]; !ok {
+					reposResp[owner] = []string{}
+				}
+
+				// Add to resp
+				reposResp[owner] = append(reposResp[owner], name)
+			}
 		}
-
-		// Add to resp
-		reposResp[owner] = append(reposResp[owner], name)
 	}
 
 	return resp.NewJSONResponder(map[string]interface{}{
