@@ -56,9 +56,7 @@ export default {
 		} else { // Fully logged in
 			this.showGantt = true
 			GoogleCharts.load(this.onChartsLoaded, {"packages": ["gantt"]})
-			if (this.pages.home.selectedRepository != "Loading...") {
-				this.loadIssues()
-			}
+			this.loadIssues()
 		}
 	},
 	methods: {
@@ -69,6 +67,10 @@ export default {
 			}
 		},
 		loadIssues() {
+			if (this.pages.home.selectedRepository == "Loading...") {
+				return
+			}
+
 			var self = this
 
 			// Get data
