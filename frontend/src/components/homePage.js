@@ -78,7 +78,7 @@ export default {
 				.then(issues => {
 					self.issues = issues
 
-					if (issues.length == 0) {
+					if (Object.keys(issues).length == 0) {
 						self.noIssues = true
 					} else {
 						self.noIssues = false
@@ -125,6 +125,11 @@ export default {
 				var end = new Date(issue.created_at)
 				end.setDate(end.getDate()+1)
 
+				var deps = null
+				if (issue.dependencies !== null) {
+					deps = issue.dependencies.join(",")
+				}
+
 				rows.push([
 					issue.number.toString(), // Issue Number
 					issue.title, // Issue Name
@@ -132,7 +137,7 @@ export default {
 					end, // End Date
 					24 * 60 * 60 * 1000, // Duration
 					0, // Completion
-					null, // Dependencies
+					deps, // Dependencies
 				])
 			}
 
