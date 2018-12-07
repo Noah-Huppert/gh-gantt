@@ -3,6 +3,7 @@ import { mapState } from "vuex"
 import { HomePageRoute } from "."
 
 export default {
+	name: "zenhub-login-page",
 	data() {
 		return {
 			zenhubAuthToken: "",

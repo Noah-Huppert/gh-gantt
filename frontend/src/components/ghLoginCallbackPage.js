@@ -3,6 +3,7 @@ import { mapState } from "vuex"
 import { HomePageRoute } from "."
 
 export default {
+	name: "gh-login-callback-page",
 	data() {
 		return {
 			loginOK: true

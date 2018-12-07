@@ -3,33 +3,40 @@ import { mapState } from "vuex"
 
 import { parseAuthToken } from "../authToken"
 import { GHLoginPageRoute, GHLoginCallbackPageRoute, ZenHubLoginPageRoute } from "."
+import RepoSelector from "./repoSelector"
 
 export default {
+	name: "home-page",
 	data() {
 		return {
 			showGantt: false,
+			chartsLoaded: false,
+			drawChartOnChartsLoad: false,
+			noIssues: false,
 			issues: []
 		}
 	},
-	computed: Object.assign(
-		mapState([
-			"authToken"
-		]), {
-		ganttData() {
-			if (!this.showGantt) {
-				return []
-			} else {
-				
-			}
-		},
-		ganttOptions() {
-			return {}
+	computed: mapState([
+			"authToken",
+			"pages"
+	]),
+	components: {
+		RepoSelector
+	},
+	watch: {
+		pages: {
+			handler() {
+				this.loadIssues()
+			},
+			deep: true
 		}
-	}),
+	},
 	template: `
 	<div>
 		<div v-if="showGantt">
-			<div id="chart"></div>
+			<repo-selector></repo-selector>
+			<h1 class="title" v-if="noIssues">No issues</h1>
+			<div id="chart" v-if="!noIssues"></div>
 		</div>
 
 		<div v-if="!showGantt">
@@ -38,8 +45,6 @@ export default {
 	</div>
 	`,
 	mounted() {
-		var self = this
-
 		// Check if logged into GitHub
 		if (this.$router.currentRoute.path != GHLoginCallbackPageRoute && 
 			this.authToken === undefined) {
@@ -49,20 +54,55 @@ export default {
 			parseAuthToken(this.authToken).zenhub_auth_token.length == 0) { // Check if logged into ZenHub
 			router.push(ZenHubLoginPageRoute)
 		} else { // Fully logged in
-			api.getIssues(this.authToken, "Noah-Huppert", "gh-gantt")
+			this.showGantt = true
+			GoogleCharts.load(this.onChartsLoaded, {"packages": ["gantt"]})
+			if (this.pages.home.selectedRepository != "Loading...") {
+				this.loadIssues()
+			}
+		}
+	},
+	methods: {
+		onChartsLoaded() {
+			this.chartsLoaded = true
+			if(this.drawChartOnChartsLoad) {
+				this.drawChart()
+			}
+		},
+		loadIssues() {
+			var self = this
+
+			// Get data
+			api.getIssues(this.authToken, this.pages.home.selectedOwner, this.pages.home.selectedRepository)
 				.then(issues => {
 					self.issues = issues
-					self.showGantt = true
 
-					GoogleCharts.load(self.drawChart, {"packages": ["gantt"]})
+					if (issues.length == 0) {
+						self.noIssues = true
+					} else {
+						self.noIssues = false
+					}
+
+
+					if (self.chartsLoaded) {
+						self.drawChart()
+					} else {
+						this.drawChartOnChartsLoad = true
+					}
 				})
 				.catch(err => {
 					console.error(err)
 				})
-		}
-	},
-	methods: {
-		drawChart() {
+		},
+		drawChart(){
+			this.$nextTick(this._drawChart)
+		},
+		_drawChart() {
+			this.drawChartOnChartsLoad = false
+			
+			if (this.noIssues) {
+				return
+			}
+
 			// Data format
 			// https://developers.google.com/chart/interactive/docs/gallery/ganttchart#data-format
 			var rows = [[
@@ -94,9 +134,9 @@ export default {
 				])
 			}
 
+			const chart = new GoogleCharts.api.visualization.Gantt(document.getElementById("chart"))	
 			const data = GoogleCharts.api.visualization.arrayToDataTable(rows)
 
-			const chart = new GoogleCharts.api.visualization.Gantt(document.getElementById("chart"))
 			const options = {
 				height: 400
 			}
