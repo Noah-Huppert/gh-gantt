@@ -2,14 +2,12 @@ package api
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/Noah-Huppert/gh-gantt/server/config"
 	"github.com/Noah-Huppert/gh-gantt/server/libgh"
+	"github.com/Noah-Huppert/gh-gantt/server/libzh"
 	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
@@ -36,30 +34,6 @@ type IssuesRequest struct {
 
 	// RepositoryName is the repository's name
 	RepositoryName string `json:"repository_name" validate:"nonzero"`
-}
-
-// zenhubIssueID identifies an issue
-type zenhubIssueID struct {
-	// RepositoryID is the ID of the repository the issue belongs to
-	RepositoryID int64 `json:"repo_id"`
-
-	// IssueNumber is the ID of the issue
-	IssueNumber int64 `json:"issue_number"`
-}
-
-// zenhubDependency holds information about an issue dependency from ZenHub
-type zenhubDependency struct {
-	// Blocking holds information about the issue which is doing the blocking
-	Blocking zenhubIssueID `json:"blocking"`
-
-	// Blocked holds information about the issue being blocked
-	Blocked zenhubIssueID `json:"blocked"`
-}
-
-// zenhubDependenciesResponse holds a list of issue dependencies from ZenHub
-type zenhubDependenciesResponse struct {
-	// Dependencies is a list of issue dependencies from ZenHub
-	Dependencies []zenhubDependency `json:"dependencies"`
 }
 
 // combinedIssue holds information about a GitHub issue from the GitHub API and the ZenHub API
@@ -118,7 +92,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 
 	// depsChan receives GitHub issue dependency information from the go routine which calls the ZenHub issue
 	// dependencies API
-	depsChan := make(chan zenhubDependency)
+	depsChan := make(chan libzh.ZenHubDependency)
 
 	// respChan receives responders from either of the 2 go routines mentioned above. If a responder is received then
 	// it is immediately returned to the client.
@@ -133,12 +107,12 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 
 	// Get GitHub issues
 	go func() {
-		issues, _, err := client.Issues.ListByRepo(h.ctx, request.RepositoryOwner, request.RepositoryName, nil)
+		listIssuesReq := libgh.NewListIssuesRequest(h.ctx, client, request.RepositoryOwner, request.RepositoryName)
+		issues, err := listIssuesReq.ListIssues()
 
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 				"error retrieving GitHub issues", err.Error())
-			return
 		}
 
 		for _, issue := range issues {
@@ -151,7 +125,9 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 	// Get ZenHub issue dependencies
 	go func() {
 		// Get GitHub repository
-		repo, _, err := client.Repositories.Get(h.ctx, request.RepositoryOwner, request.RepositoryName)
+		getRepoReq := libgh.NewGetRepositoryRequest(h.ctx, client, request.RepositoryOwner, request.RepositoryName)
+
+		repo, err := getRepoReq.GetRepository()
 
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
@@ -160,51 +136,16 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 		}
 
 		// Make ZenHub issue dependencies API request
-		depsReqURL, err := url.Parse(fmt.Sprintf("https://api.zenhub.io/p1/repositories/%d/dependencies", *(repo.ID)))
-		if err != nil {
-			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
-				"error setting up ZenHub dependencies API request",
-				fmt.Sprintf("error parsing url: %s", err.Error()))
-			return
-		}
+		getDepsResp := libzh.NewGetDependenciesRequest(*(repo.ID), authToken.ZenHubAuthToken)
 
-		depsReq := &http.Request{
-			Method: http.MethodGet,
-			URL:    depsReqURL,
-			Header: map[string][]string{
-				"X-Authentication-Token": []string{authToken.ZenHubAuthToken},
-			},
-		}
-
-		depsResp, err := http.DefaultClient.Do(depsReq)
+		deps, err := getDepsResp.GetDependencies()
 
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
-				"error retrieving issue dependencies from ZenHub API", err.Error())
-			return
+				"error retrieving ZenHub dependencies", err.Error())
 		}
 
-		if depsResp.StatusCode != http.StatusOK {
-			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
-				"error retrieving issue dependencies from ZenHub API",
-				fmt.Sprintf("status not OK: %s", depsResp.Status))
-			return
-
-		}
-
-		// Decode ZenHub issue dependencies API response
-		var deps zenhubDependenciesResponse
-
-		decoder := json.NewDecoder(depsResp.Body)
-
-		err = decoder.Decode(&deps)
-		if err != nil {
-			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
-				"error decoding ZenHub API response", err.Error())
-			return
-		}
-
-		for _, dep := range deps.Dependencies {
+		for _, dep := range deps {
 			depsChan <- dep
 		}
 
