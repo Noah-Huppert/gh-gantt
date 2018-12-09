@@ -3,7 +3,6 @@ package libissues
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/Noah-Huppert/gh-gantt/server/auth"
 	"github.com/Noah-Huppert/gh-gantt/server/libgh"
@@ -14,26 +13,8 @@ import (
 	"github.com/google/go-github/github"
 )
 
-// CombinedIssue holds information about a GitHub issue from the GitHub API and the ZenHub API
-type CombinedIssue struct {
-	// Number is an ID used to identify an issue, unique only within it's GitHub repository
-	Number int64 `json:"number"`
-
-	// Title is the issue's title
-	Title string `json:"title"`
-
-	// CreatedAt is the date and time the issue was created
-	CreatedAt time.Time `json:"created_at"`
-
-	// Estimate value for issue
-	Estimate int64 `json:"estimate"`
-
-	// Dependencies holds a list of issue numbers which the issue is blocked by
-	Dependencies []int64 `json:"dependencies"`
-}
-
 // GetCombinedIssuesRequest holds the parameters used to make API requests to GitHub and ZenHub in order to retrieve the
-// information for all issues in a repository in CombinedIssue form
+// information for all issues in a repository in Issue form
 type GetCombinedIssuesRequest struct {
 	// ctx is context
 	ctx context.Context
@@ -65,7 +46,7 @@ func NewGetCombinedIssuesRequest(ctx context.Context, logger golog.Logger, authT
 
 // Do makes the GitHub and ZenHub API requests needed to retrieve information about all issues in a repository.
 // Returns a map where keys are issue numbers, and values are issues.
-func (r GetCombinedIssuesRequest) Do() (map[int64]CombinedIssue, resp.Responder) {
+func (r GetCombinedIssuesRequest) Do() (map[int64]*Issue, resp.Responder) {
 	// Setup channels which go routines will use to send back various pieces of information
 	ghIssuesChan := make(chan github.Issue)
 	depsChan := make(chan libzh.ZenHubDependency)
@@ -153,7 +134,7 @@ func (r GetCombinedIssuesRequest) Do() (map[int64]CombinedIssue, resp.Responder)
 	}()
 
 	// Receive results from GitHub and ZenHub API requests
-	issuesResp := map[int64]CombinedIssue{}
+	issues := map[int64]*Issue{}
 
 	numDone := 0
 
@@ -169,83 +150,83 @@ func (r GetCombinedIssuesRequest) Do() (map[int64]CombinedIssue, resp.Responder)
 			number := int64(*(issue.Number))
 
 			// Check if issue exists in resp
-			if _, ok := issuesResp[number]; !ok {
-				issuesResp[number] = CombinedIssue{}
+			if _, ok := issues[number]; !ok {
+				issues[number] = &Issue{}
 			}
 
 			// Save GitHub API issue information in resp
-			ci := issuesResp[number]
+			ci := issues[number]
 
 			ci.Number = int64(number)
 			ci.Title = *(issue.Title)
 			ci.CreatedAt = *(issue.CreatedAt)
 
-			issuesResp[number] = ci
+			issues[number] = ci
 
 		case dep := <-depsChan: // Received issue dependency from ZenHub API
 			number := int64(dep.Blocked.IssueNumber)
 
 			// Check if issue exists in resp
-			if _, ok := issuesResp[number]; !ok {
-				issuesResp[number] = CombinedIssue{}
+			if _, ok := issues[number]; !ok {
+				issues[number] = &Issue{}
 			}
 
 			// Save ZenHub API information in resp
-			ci := issuesResp[number]
+			ci := issues[number]
 
 			ci.Dependencies = append(ci.Dependencies, dep.Blocking.IssueNumber)
 
-			issuesResp[number] = ci
+			issues[number] = ci
 
 		case issue := <-zhIssuesChan: // Received issue estimate from ZenHub API
 			// Check if issue exists in resp
-			if _, ok := issuesResp[issue.Number]; !ok {
-				issuesResp[issue.Number] = CombinedIssue{}
+			if _, ok := issues[issue.Number]; !ok {
+				issues[issue.Number] = &Issue{}
 			}
 
 			// Save ZenHub board information in resp
-			ci := issuesResp[issue.Number]
+			ci := issues[issue.Number]
 
 			ci.Estimate = issue.Estimate.Value
 
-			issuesResp[issue.Number] = ci
+			issues[issue.Number] = ci
 		}
 	}
 
 	// Normalize issues
-	for i, issue := range issuesResp {
+	for i, issue := range issues {
 		// For some reason the ZenHub dependencies API returns dependencies for closed issues, if an issue's title is
 		// not set, but it exists in the issues map, then only the ZenHub dependencies API returned it, and the
 		// GitHub issues API did not. So we can delete it.
 		if len(issue.Title) == 0 {
-			delete(issuesResp, i)
+			delete(issues, i)
 			continue
 		}
 
 		// If an issue doesn't have an estimate, set it to 0
 		if issue.Estimate == 0 {
-			ci := issuesResp[i]
+			ci := issues[i]
 
 			ci.Estimate = 1
 
-			issuesResp[i] = ci
+			issues[i] = ci
 		}
 
 		// Check issue dependencies exist in array
 		deps := []int64{}
 
-		for _, dep := range issuesResp[i].Dependencies {
-			if _, ok := issuesResp[dep]; ok {
+		for _, dep := range issues[i].Dependencies {
+			if _, ok := issues[dep]; ok {
 				deps = append(deps, dep)
 			}
 		}
 
-		ci := issuesResp[i]
+		ci := issues[i]
 
 		ci.Dependencies = deps
 
-		issuesResp[i] = ci
+		issues[i] = ci
 	}
 
-	return issuesResp, nil
+	return issues, nil
 }
