@@ -1,4 +1,4 @@
-package github
+package libgh
 
 import (
 	"context"

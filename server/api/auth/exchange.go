@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/Noah-Huppert/gh-gantt/server/auth"
-	"github.com/Noah-Huppert/gh-gantt/server/auth/github"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/libgh"
 	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
@@ -66,7 +66,7 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 	}
 
 	// Exchange code
-	exchangeReq := github.NewExchangeGitHubCodeReq(h.cfg, request.Code, request.State)
+	exchangeReq := libgh.NewExchangeGitHubCodeRequest(h.cfg, request.Code, request.State)
 
 	ghAuthToken, err := exchangeReq.Exchange()
 	if err != nil {
@@ -75,7 +75,9 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 	}
 
 	// Identify GitHub user
-	ghUserID, err := github.Identify(h.ctx, ghAuthToken)
+	identifyReq := libgh.NewIdentifyAuthTokenRequest(h.ctx, ghAuthToken)
+
+	ghUserID, err := identifyReq.Identify()
 	if err != nil {
 		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 			"error identifying user", err.Error())

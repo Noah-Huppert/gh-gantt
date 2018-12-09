@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	libgithub "github.com/Noah-Huppert/gh-gantt/server/auth/github"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/libgh"
 	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
@@ -43,7 +43,7 @@ func (h ReposHandler) Handle(r *http.Request) resp.Responder {
 		return errResp
 	}
 
-	client := libgithub.NewUserClient(h.ctx, authToken.GitHubAuthToken)
+	client := libgh.NewUserClient(h.ctx, authToken.GitHubAuthToken)
 
 	// Group repositories for response
 	reposResp := map[string][]string{}

@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"time"
 
-	libgithub "github.com/Noah-Huppert/gh-gantt/server/auth/github"
 	"github.com/Noah-Huppert/gh-gantt/server/config"
+	"github.com/Noah-Huppert/gh-gantt/server/libgh"
 	"github.com/Noah-Huppert/gh-gantt/server/req"
 	"github.com/Noah-Huppert/gh-gantt/server/resp"
 
@@ -129,7 +129,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 	doneChan := make(chan bool)
 
 	// Create GitHub client
-	client := libgithub.NewUserClient(h.ctx, authToken.GitHubAuthToken)
+	client := libgh.NewUserClient(h.ctx, authToken.GitHubAuthToken)
 
 	// Get GitHub issues
 	go func() {
