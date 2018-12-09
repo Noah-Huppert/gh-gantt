@@ -1,11 +1,7 @@
 package libzh
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/url"
 )
 
 // GetDependenciesRequest hold the parameters for a get ZenHub dependencies API request
@@ -50,49 +46,18 @@ type ZenHubDependenciesResponse struct {
 }
 
 func (r GetDependenciesRequest) GetDependencies() ([]ZenHubDependency, error) {
-	// Setup request
-	depsReqURL, err := url.Parse(fmt.Sprintf("https://api.zenhub.io/p1/repositories/%d/dependencies", r.RepositoryID))
-
-	if err != nil {
-		return nil, fmt.Errorf("error parsing request URL: %s", err.Error())
+	req := ZenHubAPIRequest{
+		url:       fmt.Sprintf("https://api.zenhub.io/p1/repositories/%d/dependencies", r.RepositoryID),
+		authToken: r.ZenHubAuthToken,
 	}
 
-	depsReq := &http.Request{
-		Method: http.MethodGet,
-		URL:    depsReqURL,
-		Header: map[string][]string{
-			"X-Authentication-Token": []string{r.ZenHubAuthToken},
-		},
-	}
+	var depsResp ZenHubDependenciesResponse
 
-	// Make request
-	depsResp, err := http.DefaultClient.Do(depsReq)
+	err := req.Do(&depsResp)
 
 	if err != nil {
 		return nil, fmt.Errorf("error making get dependencies ZenHub API request: %s", err.Error())
 	}
 
-	if depsResp.StatusCode != http.StatusOK {
-		// If response error, read body to print
-		respBody, err := ioutil.ReadAll(depsResp.Body)
-
-		if err != nil {
-			return nil, fmt.Errorf("get dependencies ZenHub API response status not OK, and an error occurred reading "+
-				"the body: %s", err.Error())
-		}
-
-		return nil, fmt.Errorf("get dependencies ZenHub API response status not OK, status: %s, body: %s", depsResp.Status, string(respBody))
-	}
-
-	// Decode ZenHub issue dependencies API response
-	var deps ZenHubDependenciesResponse
-
-	decoder := json.NewDecoder(depsResp.Body)
-
-	err = decoder.Decode(&deps)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding get dependencies ZenHub API response body: %s", err.Error())
-	}
-
-	return deps.Dependencies, nil
+	return depsResp.Dependencies, nil
 }
