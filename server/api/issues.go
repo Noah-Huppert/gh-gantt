@@ -243,11 +243,15 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 
 	// Normalize issues
 	for i, issue := range issuesResp {
+		// For some reason the ZenHub dependencies API returns dependencies for closed issues, if an issue's title is
+		// not set, but it exists in the issues map, then only the ZenHub dependencies API returned it, and the
+		// GitHub issues API did not. So we can delete it.
 		if len(issue.Title) == 0 {
 			delete(issuesResp, i)
 			continue
 		}
 
+		// If an issue doesn't have an estimate, set it to 0
 		if issue.Estimate == 0 {
 			ci := issuesResp[i]
 
