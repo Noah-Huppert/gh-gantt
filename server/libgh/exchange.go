@@ -1,4 +1,4 @@
-package github
+package libgh
 
 import (
 	"bytes"
@@ -12,9 +12,9 @@ import (
 // ExchangeGitHubCodeURL is the GitHub API URL used to exchange a GitHub code for a token
 const exchangeGitHubCodeURL string = "https://github.com/login/oauth/access_token"
 
-// ExchangeGitHubCodeReq holds the parameters required to make a GitHub API request to exchange a temporary GitHub
+// ExchangeGitHubCodeRequest holds the parameters required to make a GitHub API request to exchange a temporary GitHub
 // code for a longer lasting GitHub token
-type ExchangeGitHubCodeReq struct {
+type ExchangeGitHubCodeRequest struct {
 	// ClientID is the GitHub app's Client ID
 	ClientID string `json:"client_id"`
 
@@ -37,10 +37,10 @@ type exchangeGitHubCodeResp struct {
 	Error string `json:"error"`
 }
 
-// NewExchangeGitHubCodeReq creates a new ExchangeGitHubCodeReq. Most of the fields can be filled by passing an
+// NewExchangeGitHubCodeRequest creates a new ExchangeGitHubCodeRequest. Most of the fields can be filled by passing an
 // config.Config object
-func NewExchangeGitHubCodeReq(cfg config.Config, code, state string) ExchangeGitHubCodeReq {
-	return ExchangeGitHubCodeReq{
+func NewExchangeGitHubCodeRequest(cfg config.Config, code, state string) ExchangeGitHubCodeRequest {
+	return ExchangeGitHubCodeRequest{
 		ClientID:     cfg.GitHubClientID,
 		ClientSecret: cfg.GitHubClientSecret,
 		Code:         code,
@@ -49,7 +49,7 @@ func NewExchangeGitHubCodeReq(cfg config.Config, code, state string) ExchangeGit
 }
 
 // Exchange exchanges a temporary GitHub code for a longer lasting GitHub token
-func (r ExchangeGitHubCodeReq) Exchange() (string, error) {
+func (r ExchangeGitHubCodeRequest) Do() (string, error) {
 	// Encode request body
 	var body []byte
 	reqBodyBuffer := bytes.NewBuffer(body)
