@@ -45,7 +45,8 @@ type ZenHubDependenciesResponse struct {
 	Dependencies []ZenHubDependency `json:"dependencies"`
 }
 
-func (r GetDependenciesRequest) GetDependencies() ([]ZenHubDependency, error) {
+// Do makes the get dependencies ZenHub API request
+func (r GetDependenciesRequest) Do() ([]ZenHubDependency, error) {
 	req := ZenHubAPIRequest{
 		url:       fmt.Sprintf("https://api.zenhub.io/p1/repositories/%d/dependencies", r.RepositoryID),
 		authToken: r.ZenHubAuthToken,

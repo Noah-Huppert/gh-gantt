@@ -33,7 +33,7 @@ func NewGetRepositoryRequest(ctx context.Context, client *github.Client, owner, 
 }
 
 // GetRepository makes a get repository GitHub API request
-func (r GetRepositoryRequest) GetRepository() (*github.Repository, error) {
+func (r GetRepositoryRequest) Do() (*github.Repository, error) {
 	repo, _, err := r.client.Repositories.Get(r.ctx, r.owner, r.name)
 
 	if err != nil {

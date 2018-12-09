@@ -25,7 +25,7 @@ func NewIdentifyAuthTokenRequest(ctx context.Context, authToken string) Identify
 }
 
 // Identify returns the user ID of the GitHub user who owns the provided GH auth token
-func (r IdentifyAuthTokenRequest) Identify() (string, error) {
+func (r IdentifyAuthTokenRequest) Do() (string, error) {
 	// Create GitHub API client
 	client := NewUserClient(r.ctx, r.authToken)
 

@@ -108,7 +108,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 	// Get GitHub issues
 	go func() {
 		listIssuesReq := libgh.NewListIssuesRequest(h.ctx, client, request.RepositoryOwner, request.RepositoryName)
-		issues, err := listIssuesReq.ListIssues()
+		issues, err := listIssuesReq.Do()
 
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
@@ -127,7 +127,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 		// Get GitHub repository
 		getRepoReq := libgh.NewGetRepositoryRequest(h.ctx, client, request.RepositoryOwner, request.RepositoryName)
 
-		repo, err := getRepoReq.GetRepository()
+		repo, err := getRepoReq.Do()
 
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
@@ -138,7 +138,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 		// Make ZenHub issue dependencies API request
 		getDepsResp := libzh.NewGetDependenciesRequest(*(repo.ID), authToken.ZenHubAuthToken)
 
-		deps, err := getDepsResp.GetDependencies()
+		deps, err := getDepsResp.Do()
 
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,

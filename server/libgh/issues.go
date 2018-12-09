@@ -33,7 +33,7 @@ func NewListIssuesRequest(ctx context.Context, client *github.Client, owner, nam
 }
 
 // ListIssues makes the list issues GitHub API request
-func (r ListIssuesRequest) ListIssues() ([]*github.Issue, error) {
+func (r ListIssuesRequest) Do() ([]*github.Issue, error) {
 	issues, _, err := r.client.Issues.ListByRepo(r.ctx, r.owner, r.name, nil)
 
 	if err != nil {

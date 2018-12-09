@@ -49,7 +49,7 @@ func NewExchangeGitHubCodeRequest(cfg config.Config, code, state string) Exchang
 }
 
 // Exchange exchanges a temporary GitHub code for a longer lasting GitHub token
-func (r ExchangeGitHubCodeRequest) Exchange() (string, error) {
+func (r ExchangeGitHubCodeRequest) Do() (string, error) {
 	// Encode request body
 	var body []byte
 	reqBodyBuffer := bytes.NewBuffer(body)

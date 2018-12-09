@@ -68,7 +68,7 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 	// Exchange code
 	exchangeReq := libgh.NewExchangeGitHubCodeRequest(h.cfg, request.Code, request.State)
 
-	ghAuthToken, err := exchangeReq.Exchange()
+	ghAuthToken, err := exchangeReq.Do()
 	if err != nil {
 		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 			"error exchanging code for GitHub access token", err.Error())
@@ -77,7 +77,7 @@ func (h AuthExchangeHandler) Handle(r *http.Request) resp.Responder {
 	// Identify GitHub user
 	identifyReq := libgh.NewIdentifyAuthTokenRequest(h.ctx, ghAuthToken)
 
-	ghUserID, err := identifyReq.Identify()
+	ghUserID, err := identifyReq.Do()
 	if err != nil {
 		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 			"error identifying user", err.Error())
