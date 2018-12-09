@@ -1,9 +1,16 @@
 package libissues
 
+import (
+	"fmt"
+)
+
 // IssueNode is a node in an issue graph
 type IssueNode struct {
 	// Issue is the node's issue. If nil the node is considered a root node.
 	Issue *Issue
+
+	// NumDescendants holds the number of descendants a node has
+	NumDescendants int
 
 	// Children are the nodes children in the graph
 	Children []*IssueNode
@@ -17,6 +24,30 @@ func NewIssueNode(issue *Issue) *IssueNode {
 	}
 }
 
+// String returns a string representation of a graph
+func (n IssueNode) String() string {
+	str := "["
+	if n.Issue != nil {
+		str += fmt.Sprintf("%d", n.Issue.Number)
+	} else {
+		str += "nil"
+	}
+
+	str += fmt.Sprintf("(%d)", len(n.Children))
+
+	str += "<"
+
+	for _, child := range n.Children {
+		str += child.String()
+	}
+
+	str += ">"
+
+	str += "]"
+
+	return str
+}
+
 // BuildGraph creates a graph from issues.
 // Returns a root node which all other nodes are children of.
 func BuildGraph(issues map[int64]*Issue) *IssueNode {
@@ -26,6 +57,8 @@ func BuildGraph(issues map[int64]*Issue) *IssueNode {
 	for _, issue := range issues {
 		insertIssue(root, nodes, issues, issue.Number)
 	}
+
+	findNumDescendants(root)
 
 	return root
 }
@@ -57,5 +90,20 @@ func insertIssue(root *IssueNode, nodes map[int64]*IssueNode, issues map[int64]*
 			depNode.Children = append(depNode.Children, node)
 			nodes[depNumber] = depNode
 		}
+	}
+}
+
+// findNumDescendants finds the number of descendants for each node in a graph
+func findNumDescendants(root *IssueNode) {
+	if len(root.Children) == 0 {
+		root.NumDescendants = 0
+		return
+	}
+
+	root.NumDescendants += len(root.Children)
+
+	for _, child := range root.Children {
+		findNumDescendants(child)
+		root.NumDescendants += child.NumDescendants
 	}
 }

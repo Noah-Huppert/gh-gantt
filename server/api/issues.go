@@ -80,7 +80,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 
 	// Build graph from issues
 	graph := libissues.BuildGraph(issues)
-	h.logger.Debugf("graph: %#v", graph)
+	h.logger.Debugf("debug: %s", graph.String())
 
 	return resp.NewJSONResponder(map[string]interface{}{
 		"issues": issues,
