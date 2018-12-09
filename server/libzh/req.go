@@ -34,6 +34,9 @@ func (r ZenHubAPIRequest) Do(respVar interface{}) error {
 		return fmt.Errorf("error parsing request URL: %s", err.Error())
 	}
 
+	reqURL.Scheme = "https"
+	reqURL.Host = "api.zenhub.io"
+
 	req := &http.Request{
 		Method: http.MethodGet,
 		URL:    reqURL,

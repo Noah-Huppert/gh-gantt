@@ -7,14 +7,14 @@ import (
 // GetBoardRequest holds parameters for a get board ZenHub API request
 type GetBoardRequest struct {
 	// repositoryID is the ID of the repository to fetch a ZenHub board for
-	repositoryID string
+	repositoryID int64
 
 	// authToken is a ZenHub API auth token
 	authToken string
 }
 
 // NewGetBoardRequest creates a GetBoardRequest
-func NewGetBoardRequest(repositoryID, authToken string) GetBoardRequest {
+func NewGetBoardRequest(repositoryID int64, authToken string) GetBoardRequest {
 	return GetBoardRequest{
 		repositoryID: repositoryID,
 		authToken:    authToken,
@@ -25,9 +25,6 @@ func NewGetBoardRequest(repositoryID, authToken string) GetBoardRequest {
 type ZenHubBoardIssue struct {
 	// Number is the ID of an issue, unique inside of a repository
 	Number int64 `json:"issue_number"`
-
-	// IsEpic indicates if the issue is an epic
-	IsEpic bool `json:"is_epic"`
 
 	// Estimate is a value used to indicate how much work an issue will take to resolve
 	Estimate struct {

@@ -47,6 +47,9 @@ type combinedIssue struct {
 	// CreatedAt is the date and time the issue was created
 	CreatedAt time.Time `json:"created_at"`
 
+	// Estimate value for issue
+	Estimate int64 `json:"estimate"`
+
 	// Dependencies holds a list of issue numbers which the issue is blocked by
 	Dependencies []int64 `json:"dependencies"`
 }
@@ -87,12 +90,15 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 	request.RepositoryName = repoName
 
 	// Setup channels
-	// issuesChan receives GitHub issues from the go routine which calls the GitHub issues API
-	issuesChan := make(chan github.Issue)
+	// ghIssuesChan receives GitHub issues from the go routine which calls the GitHub issues API
+	ghIssuesChan := make(chan github.Issue)
 
 	// depsChan receives GitHub issue dependency information from the go routine which calls the ZenHub issue
 	// dependencies API
 	depsChan := make(chan libzh.ZenHubDependency)
+
+	// zhIssuesChan receives ZenHub issues from the go routine which calls the ZenHub board API
+	zhIssuesChan := make(chan libzh.ZenHubBoardIssue)
 
 	// respChan receives responders from either of the 2 go routines mentioned above. If a responder is received then
 	// it is immediately returned to the client.
@@ -113,40 +119,63 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 				"error retrieving GitHub issues", err.Error())
+			return
 		}
 
 		for _, issue := range issues {
-			issuesChan <- *issue
+			ghIssuesChan <- *issue
 		}
 
 		doneChan <- true
 	}()
 
+	// Get GitHub repository
+	getRepoReq := libgh.NewGetRepositoryRequest(h.ctx, client, request.RepositoryOwner, request.RepositoryName)
+
+	repo, err := getRepoReq.Do()
+
+	if err != nil {
+		return resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
+			"error retrieving GitHub repository from GitHub API", err.Error())
+	}
+
 	// Get ZenHub issue dependencies
 	go func() {
-		// Get GitHub repository
-		getRepoReq := libgh.NewGetRepositoryRequest(h.ctx, client, request.RepositoryOwner, request.RepositoryName)
-
-		repo, err := getRepoReq.Do()
-
-		if err != nil {
-			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
-				"error retrieving GitHub repository from GitHub API", err.Error())
-			return
-		}
-
 		// Make ZenHub issue dependencies API request
-		getDepsResp := libzh.NewGetDependenciesRequest(*(repo.ID), authToken.ZenHubAuthToken)
+		getDepsReq := libzh.NewGetDependenciesRequest(*(repo.ID), authToken.ZenHubAuthToken)
 
-		deps, err := getDepsResp.Do()
+		deps, err := getDepsReq.Do()
 
 		if err != nil {
 			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
 				"error retrieving ZenHub dependencies", err.Error())
+			return
 		}
 
+		// Send to main thread
 		for _, dep := range deps {
 			depsChan <- dep
+		}
+
+		doneChan <- true
+	}()
+
+	// Get ZenHub issue estimates
+	go func() {
+		// Make ZenHub get board API request
+		getBoardReq := libzh.NewGetBoardRequest(*(repo.ID), authToken.ZenHubAuthToken)
+
+		issues, err := getBoardReq.Do()
+
+		if err != nil {
+			respChan <- resp.NewStrErrorResponder(h.logger, http.StatusInternalServerError,
+				"error retrieving ZenHub issues", err.Error())
+			return
+		}
+
+		// Send to main thread
+		for _, issue := range issues {
+			zhIssuesChan <- issue
 		}
 
 		doneChan <- true
@@ -165,7 +194,7 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 		case <-doneChan:
 			numDone++
 
-		case issue := <-issuesChan:
+		case issue := <-ghIssuesChan:
 			number := int64(*(issue.Number))
 
 			// Check if issue exists in resp
@@ -196,13 +225,35 @@ func (h IssuesHandler) Handle(r *http.Request) resp.Responder {
 			ci.Dependencies = append(ci.Dependencies, dep.Blocking.IssueNumber)
 
 			issuesResp[number] = ci
+
+		case issue := <-zhIssuesChan:
+			// Check if issue exists in resp
+			if _, ok := issuesResp[issue.Number]; !ok {
+				issuesResp[issue.Number] = combinedIssue{}
+			}
+
+			// Save ZenHub board information in resp
+			ci := issuesResp[issue.Number]
+
+			ci.Estimate = issue.Estimate.Value
+
+			issuesResp[issue.Number] = ci
 		}
 	}
 
-	// Trim empty issues
-	for number, issue := range issuesResp {
+	// Normalize issues
+	for i, issue := range issuesResp {
 		if len(issue.Title) == 0 {
-			delete(issuesResp, number)
+			delete(issuesResp, i)
+			continue
+		}
+
+		if issue.Estimate == 0 {
+			ci := issuesResp[i]
+
+			ci.Estimate = 1
+
+			issuesResp[i] = ci
 		}
 	}
 
