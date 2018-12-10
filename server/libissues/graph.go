@@ -9,7 +9,7 @@ type IssueNode struct {
 	// Issue is the node's issue. If nil the node is considered a root node.
 	Issue *Issue
 
-	// NumDescendants holds the number of descendants a node has
+	// NumDescendants holds the number of descendants a node has. If not computed yet then set to -1.
 	NumDescendants int
 
 	// Children are the nodes children in the graph
@@ -19,8 +19,9 @@ type IssueNode struct {
 // NewIssueNode creates an IssueNode
 func NewIssueNode(issue *Issue) *IssueNode {
 	return &IssueNode{
-		Issue:    issue,
-		Children: []*IssueNode{},
+		Issue:          issue,
+		NumDescendants: -1,
+		Children:       []*IssueNode{},
 	}
 }
 
@@ -95,15 +96,24 @@ func insertIssue(root *IssueNode, nodes map[int64]*IssueNode, issues map[int64]*
 
 // findNumDescendants finds the number of descendants for each node in a graph
 func findNumDescendants(root *IssueNode) {
+	// If already computed
+	if root.NumDescendants >= 0 {
+		return
+	}
+
+	// If no children
 	if len(root.Children) == 0 {
 		root.NumDescendants = 0
 		return
 	}
 
+	// If children
 	root.NumDescendants += len(root.Children)
 
 	for _, child := range root.Children {
+		// Compute descendants for each child
 		findNumDescendants(child)
+
 		root.NumDescendants += child.NumDescendants
 	}
 }
