@@ -1,14 +1,18 @@
+**Project Status:** Development paused for the foreseeable future  
+
+All stakeholders (me included) no longer needed a Gantt chart for ZenHub.  
+
+Progress was made to retrieve issue details from ZenHub and a rudimentary gantt 
+could be created. However no critical path finding logic was implemented.  
+
+If you are interested in continuing development in a fork and would like to ask
+questions about the existing code base feel free to open an issue.
+
 # GitHub Gantt
 GitHub issues gantt chart generator.  
 
 # Table Of Contents
-- [Our Sponsors](#our-sponsors)
 - [Overview](#overview)
-
-# Our Sponsors
-[![Enzyme Logo](img/enzyme_logo_blue.svg)](https://www.enzyme.com)  
-  
-[Enzyme](https://www.enzyme.com) sponsors the development of this project.  
 
 # Overview
 GH Gantt displays GitHub issues in gantt chart form. ZenHub is used to augment 
