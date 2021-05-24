@@ -1,12 +1,8 @@
-**Project Status:** Development paused for the foreseeable future  
+Project status: On-hold
 
-All stakeholders (me included) no longer needed a Gantt chart for ZenHub.  
-
-Progress was made to retrieve issue details from ZenHub and a rudimentary gantt 
-could be created. However no critical path finding logic was implemented.  
-
-If you are interested in continuing development in a fork and would like to ask
-questions about the existing code base feel free to open an issue.
+- ZenHub issues could be retrieved
+- A Gantt chart could be rendered with these issues and simpler ordering
+- Critical path TODO
 
 # GitHub Gantt
 GitHub issues gantt chart generator.  
